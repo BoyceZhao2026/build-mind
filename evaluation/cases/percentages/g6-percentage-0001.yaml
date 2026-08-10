@@ -1,0 +1,253 @@
+schema_version: '1.0'
+case_id: g6-percentage-0001
+status: draft
+scope:
+  subject: 数学
+  grade: 六年级
+  domain: 应用题
+  problem_type: percentage
+  subtype: discount_find_original
+  difficulty: basic
+  curriculum_tags:
+  - 百分数
+  - 折扣
+  - 方程
+  - 单位1
+source:
+  origin: original
+  source_reference: null
+  copyright_status: cleared
+problem:
+  text: 一双运动鞋打八五折后售价272元。这双鞋的原价是多少元？
+  question: 求运动鞋原价
+  answer_form: quantity_with_unit
+  has_irrelevant_information: false
+  has_implicit_condition: false
+  implicit_conditions: []
+objects:
+- object_id: original_price
+  name: 原价
+  type: price
+  owner: null
+  value: null
+  unit: 元
+  role: unknown
+  source_span: 原价
+- object_id: sale_price
+  name: 现价
+  type: price
+  owner: null
+  value: 272
+  unit: 元
+  role: given
+  source_span: 售价272元
+- object_id: discount_rate
+  name: 折扣率
+  type: other
+  owner: null
+  value: 85%
+  unit: null
+  role: given
+  source_span: 打八五折
+relationships:
+- relationship_id: r1
+  type: percentage_of
+  natural_language: 现价是原价的85%
+  expression: sale_price = original_price * 85%
+  operands:
+  - original_price
+  - discount_rate
+  result: sale_price
+  required_conditions: []
+unit_one:
+  required: true
+  object_id: original_price
+  evidence: 折扣率表示现价占原价的百分比，原价是单位“1”
+answer:
+  final_value: 320
+  unit: 元
+  accepted_forms:
+  - '320'
+  - 320元
+  validation_expression: 320 * 0.85 = 272
+  internal_only: true
+solution_paths:
+- path_id: path_1
+  method: 设原价为x的方程法
+  age_appropriate: true
+  priority: 1
+  prerequisites:
+  - 理解八五折=85%
+  steps:
+  - step_id: p1_s1
+    depends_on: []
+    goal: 确定单位1与折扣含义
+    action: identify
+    input_objects:
+    - original_price
+    - discount_rate
+    output_object: original_price
+    expression_before: null
+    operation: 设原价x元，八五折表示现价为85%x
+    expression_after: sale_price=0.85x
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s2
+    depends_on:
+    - p1_s1
+    goal: 根据已知现价列方程
+    action: build_relation
+    input_objects:
+    - sale_price
+    output_object: null
+    expression_before: null
+    operation: 0.85x=272
+    expression_after: 0.85x=272
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s3
+    depends_on:
+    - p1_s2
+    goal: 解出原价
+    action: solve
+    input_objects: []
+    output_object: original_price
+    expression_before: null
+    operation: 272÷0.85
+    expression_after: x=320
+    result_value: 320
+    unit: 元
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 320*0.85==272
+  - step_id: p1_s4
+    depends_on:
+    - p1_s3
+    goal: 检查折后价格
+    action: check
+    input_objects:
+    - original_price
+    - discount_rate
+    output_object: null
+    expression_before: null
+    operation: 320×85%=272
+    expression_after: 320*85%=272
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+solution_graph:
+  nodes:
+  - node_id: n1
+    label: 识别原价为单位1
+    object_ids:
+    - original_price
+  - node_id: n2
+    label: 八五折转85%
+    object_ids:
+    - discount_rate
+  - node_id: n3
+    label: 现价关系列方程
+    object_ids:
+    - sale_price
+  - node_id: n4
+    label: 求解检验
+    object_ids:
+    - original_price
+  edges:
+  - from: n1
+    to: n2
+  - from: n2
+    to: n3
+  - from: n3
+    to: n4
+  branch_rules: []
+common_errors:
+- error_id: e1
+  type: percentage_meaning
+  student_expression: 0.15x=272
+  first_error_span: '0.15'
+  misconception: 把优惠率15%当成现价率
+  diagnostic_question: 272元是付掉的钱还是优惠掉的钱？
+  preferred_teaching_action: CLARIFY_PERCENTAGE_ROLE
+- error_id: e2
+  type: percentage_conversion
+  student_expression: 85x=272
+  first_error_span: '85'
+  misconception: 把85%当85
+  diagnostic_question: 85%写成小数是多少？
+  preferred_teaching_action: RECALL_PERCENT_CONVERSION
+teaching_boundaries:
+  before_student_final_attempt:
+    allowed:
+    - 询问未知量应设为什么
+    - 询问题目中的核心等量关系
+    - 只提示当前一步，不直接给出最终答案
+    forbidden:
+    - 直接输出最终答案
+    - 一次展示完整方程、求解过程和答案
+  after_student_final_attempt:
+    allowed:
+    - 判断答案是否正确
+    - 要求学生解释等量关系
+    - 引导代回检验
+    forbidden: []
+understanding_checks:
+  explain_why:
+    prompt: 为什么方程是0.85x=272，而不是0.15x=272？
+    key_elements:
+    - 85%是现价率
+    - 15%才是优惠率
+    common_weak_answers:
+    - 只说“因为老师这样教”
+    - 只报结果，不解释数量关系
+  error_detection:
+    prompt: 小明用272÷15%求原价，错在哪里？
+    error_example: 272/15%
+    expected_explanation: 272是现价，不是优惠金额
+  micro_transfer:
+    prompt: 若七五折后售价300元，只列方程。
+    expected_answer: 0.75x=300
+    changed_core_feature: 改变折扣率
+review:
+  math_reviewer: null
+  pedagogy_reviewer: null
+  reviewed_at: null
+  tool_verification_passed: true
+  notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+type_specific:
+  base_object_id: original_price
+  percentage: 85%
+  percentage_role: sale_price_rate
+  target_object_id: sale_price
+  normalized_relationship: sale_price = original_price * 85%

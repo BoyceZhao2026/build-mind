@@ -1,0 +1,272 @@
+schema_version: '1.0'
+case_id: g6-multiple-0002
+status: draft
+scope:
+  subject: 数学
+  grade: 六年级
+  domain: 应用题
+  problem_type: multiple
+  subtype: more_than_by_times
+  difficulty: intermediate
+  curriculum_tags:
+  - 倍数问题
+  - 多几倍
+  - 语言辨析
+source:
+  origin: original
+  source_reference: null
+  copyright_status: cleared
+problem:
+  text: 图书馆里科技书比故事书多2倍，两类书一共有80本。科技书和故事书各有多少本？
+  question: 求科技书和故事书各有多少本
+  answer_form: quantity_with_unit
+  has_irrelevant_information: false
+  has_implicit_condition: false
+  implicit_conditions: []
+objects:
+- object_id: story
+  name: 故事书数量
+  type: amount
+  owner: null
+  value: null
+  unit: 本
+  role: unknown
+  source_span: 故事书
+- object_id: science
+  name: 科技书数量
+  type: amount
+  owner: null
+  value: null
+  unit: 本
+  role: unknown
+  source_span: 科技书
+- object_id: times_more
+  name: 多出的倍数
+  type: other
+  owner: null
+  value: 2
+  unit: null
+  role: given
+  source_span: 多2倍
+- object_id: total
+  name: 总数
+  type: amount
+  owner: null
+  value: 80
+  unit: 本
+  role: given
+  source_span: 一共有80本
+relationships:
+- relationship_id: r1
+  type: multiple
+  natural_language: 科技书比故事书多2倍，即科技书是故事书的3倍
+  expression: science = story * (1 + 2)
+  operands:
+  - story
+  - times_more
+  result: science
+  required_conditions: []
+- relationship_id: r2
+  type: sum
+  natural_language: 两类书共80本
+  expression: science + story = total
+  operands:
+  - science
+  - story
+  result: total
+  required_conditions: []
+unit_one:
+  required: false
+  object_id: null
+  evidence: null
+answer:
+  final_value:
+    story: 20
+    science: 60
+  unit: 本
+  accepted_forms:
+  - 故事书20本，科技书60本
+  validation_expression: 20 + 60 = 80; 60 = 20 * 3
+  internal_only: true
+solution_paths:
+- path_id: path_1
+  method: 先规范化“多2倍”再列方程
+  age_appropriate: true
+  priority: 1
+  prerequisites:
+  - 理解“比A多2倍”=A+2A=3A
+  steps:
+  - step_id: p1_s1
+    depends_on: []
+    goal: 解释“多2倍”
+    action: identify
+    input_objects:
+    - story
+    - times_more
+    output_object: science
+    expression_before: null
+    operation: 科技书=故事书+故事书的2倍
+    expression_after: science=3*story
+    result_value: null
+    unit: null
+    required_understanding: “多2倍”包含原来的1倍
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s2
+    depends_on:
+    - p1_s1
+    goal: 设标准量并列方程
+    action: build_relation
+    input_objects:
+    - story
+    - science
+    - total
+    output_object: null
+    expression_before: null
+    operation: 设故事书x本，则科技书3x本，总数80
+    expression_after: x+3x=80
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s3
+    depends_on:
+    - p1_s2
+    goal: 求故事书
+    action: solve
+    input_objects: []
+    output_object: story
+    expression_before: null
+    operation: 解4x=80
+    expression_after: x=20
+    result_value: 20
+    unit: 本
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 20+3*20==80
+  - step_id: p1_s4
+    depends_on:
+    - p1_s3
+    goal: 求科技书并检验
+    action: check
+    input_objects:
+    - story
+    output_object: science
+    expression_before: null
+    operation: 3×20=60
+    expression_after: science=60
+    result_value: 60
+    unit: 本
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+solution_graph:
+  nodes:
+  - node_id: n1
+    label: 辨析“多2倍”
+    object_ids:
+    - times_more
+  - node_id: n2
+    label: 设故事书x
+    object_ids:
+    - story
+  - node_id: n3
+    label: 表示科技书3x
+    object_ids:
+    - science
+  - node_id: n4
+    label: 列方程并求解
+    object_ids:
+    - total
+  edges:
+  - from: n1
+    to: n2
+  - from: n2
+    to: n3
+  - from: n3
+    to: n4
+  branch_rules: []
+common_errors:
+- error_id: e1
+  type: relation
+  student_expression: science=2x
+  first_error_span: 2x
+  misconception: 把“多2倍”误当“是2倍”
+  diagnostic_question: 原来有1倍，再“多2倍”，一共是几倍？
+  preferred_teaching_action: CLARIFY_MORE_THAN_TIMES
+- error_id: e2
+  type: operation
+  student_expression: science=x+2
+  first_error_span: '+2'
+  misconception: 把倍数当数量差
+  diagnostic_question: 题目说多2“倍”还是多2“本”？
+  preferred_teaching_action: CLARIFY_UNIT
+teaching_boundaries:
+  before_student_final_attempt:
+    allowed:
+    - 询问未知量应设为什么
+    - 询问题目中的核心等量关系
+    - 只提示当前一步，不直接给出最终答案
+    forbidden:
+    - 直接输出最终答案
+    - 一次展示完整方程、求解过程和答案
+  after_student_final_attempt:
+    allowed:
+    - 判断答案是否正确
+    - 要求学生解释等量关系
+    - 引导代回检验
+    forbidden: []
+understanding_checks:
+  explain_why:
+    prompt: 为什么“比故事书多2倍”要表示成3x？
+    key_elements:
+    - 原有1x
+    - 多出2x
+    - 合计3x
+    common_weak_answers:
+    - 只说“因为老师这样教”
+    - 只报结果，不解释数量关系
+  error_detection:
+    prompt: 如果写成2x，会把哪一部分漏掉？
+    error_example: science=2x
+    expected_explanation: 漏掉了科技书中与故事书相等的原1倍
+  micro_transfer:
+    prompt: 若改成“科技书是故事书的2倍”，总数80，只列方程。
+    expected_answer: x+2x=80
+    changed_core_feature: 把“多2倍”改为“是2倍”
+review:
+  math_reviewer: null
+  pedagogy_reviewer: null
+  reviewed_at: null
+  tool_verification_passed: true
+  notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+type_specific:
+  base_object_id: story
+  compared_object_id: science
+  multiplier: 2
+  phrase_type: more_than_by_times
+  normalized_relationship: science = story * (1 + 2)

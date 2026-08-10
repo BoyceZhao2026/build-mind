@@ -1,0 +1,273 @@
+schema_version: '1.0'
+case_id: g6-fraction-0002
+status: draft
+scope:
+  subject: 数学
+  grade: 六年级
+  domain: 应用题
+  problem_type: fraction
+  subtype: part_to_part_with_total
+  difficulty: intermediate
+  curriculum_tags:
+  - 分数应用题
+  - 单位1
+  - 总量
+source:
+  origin: original
+  source_reference: null
+  copyright_status: cleared
+problem:
+  text: 六年级参加合唱队的女生人数是男生的4/5，男女生一共有54人。男生和女生各有多少人？
+  question: 求男生和女生人数
+  answer_form: quantity_with_unit
+  has_irrelevant_information: false
+  has_implicit_condition: false
+  implicit_conditions: []
+objects:
+- object_id: boys
+  name: 男生人数
+  type: amount
+  owner: null
+  value: null
+  unit: 人
+  role: unknown
+  source_span: 男生
+- object_id: girls
+  name: 女生人数
+  type: amount
+  owner: null
+  value: null
+  unit: 人
+  role: unknown
+  source_span: 女生
+- object_id: fraction
+  name: 女生占男生的分率
+  type: other
+  owner: null
+  value: 4/5
+  unit: null
+  role: given
+  source_span: 女生人数是男生的4/5
+- object_id: total
+  name: 总人数
+  type: amount
+  owner: null
+  value: 54
+  unit: 人
+  role: given
+  source_span: 一共有54人
+relationships:
+- relationship_id: r1
+  type: fraction_of
+  natural_language: 女生是男生的4/5
+  expression: girls = boys * 4/5
+  operands:
+  - boys
+  - fraction
+  result: girls
+  required_conditions: []
+- relationship_id: r2
+  type: sum
+  natural_language: 男女生总数54
+  expression: boys + girls = total
+  operands:
+  - boys
+  - girls
+  result: total
+  required_conditions: []
+unit_one:
+  required: true
+  object_id: boys
+  evidence: “女生人数是男生的4/5”，男生是被比较的单位“1”
+answer:
+  final_value:
+    boys: 30
+    girls: 24
+  unit: 人
+  accepted_forms:
+  - 男生30人，女生24人
+  validation_expression: 30 + 24 = 54; 24 = 30 * 4/5
+  internal_only: true
+solution_paths:
+- path_id: path_1
+  method: 设单位1男生为x
+  age_appropriate: true
+  priority: 1
+  prerequisites:
+  - 识别“谁的4/5”中的单位1
+  steps:
+  - step_id: p1_s1
+    depends_on: []
+    goal: 找单位1并设未知数
+    action: identify
+    input_objects:
+    - boys
+    - girls
+    - fraction
+    output_object: boys
+    expression_before: null
+    operation: 设男生x人
+    expression_after: boys=x
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s2
+    depends_on:
+    - p1_s1
+    goal: 用分率表示女生
+    action: define
+    input_objects:
+    - boys
+    - fraction
+    output_object: girls
+    expression_before: null
+    operation: 女生为4/5x
+    expression_after: girls=4/5*x
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s3
+    depends_on:
+    - p1_s2
+    goal: 根据总数列方程求男生
+    action: solve
+    input_objects:
+    - total
+    output_object: boys
+    expression_before: null
+    operation: x+4/5x=54
+    expression_after: x=30
+    result_value: 30
+    unit: 人
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 30+30*4/5==54
+  - step_id: p1_s4
+    depends_on:
+    - p1_s3
+    goal: 求女生并检验
+    action: check
+    input_objects:
+    - boys
+    - fraction
+    output_object: girls
+    expression_before: null
+    operation: 30×4/5=24
+    expression_after: girls=24
+    result_value: 24
+    unit: 人
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+solution_graph:
+  nodes:
+  - node_id: n1
+    label: 识别男生为单位1
+    object_ids:
+    - boys
+  - node_id: n2
+    label: 女生表示为4/5x
+    object_ids:
+    - girls
+  - node_id: n3
+    label: 利用总数54
+    object_ids:
+    - total
+  - node_id: n4
+    label: 求解检验
+    object_ids:
+    - boys
+    - girls
+  edges:
+  - from: n1
+    to: n2
+  - from: n2
+    to: n3
+  - from: n3
+    to: n4
+  branch_rules: []
+common_errors:
+- error_id: e1
+  type: unit_one
+  student_expression: boys = girls * 4/5
+  first_error_span: boys
+  misconception: 把单位1找反
+  diagnostic_question: 题目说“女生是男生的4/5”，谁被当作整体标准？
+  preferred_teaching_action: IDENTIFY_UNIT_ONE
+- error_id: e2
+  type: operation
+  student_expression: x + 4/5 = 54
+  first_error_span: +4/5
+  misconception: 把分率当作人数直接相加
+  diagnostic_question: 4/5有“人”这个单位吗？
+  preferred_teaching_action: CLARIFY_RATE_VS_QUANTITY
+teaching_boundaries:
+  before_student_final_attempt:
+    allowed:
+    - 询问未知量应设为什么
+    - 询问题目中的核心等量关系
+    - 只提示当前一步，不直接给出最终答案
+    forbidden:
+    - 直接输出最终答案
+    - 一次展示完整方程、求解过程和答案
+  after_student_final_attempt:
+    allowed:
+    - 判断答案是否正确
+    - 要求学生解释等量关系
+    - 引导代回检验
+    forbidden: []
+understanding_checks:
+  explain_why:
+    prompt: 为什么这里男生是单位“1”？
+    key_elements:
+    - “女生是男生的4/5”
+    - 男生是被比较标准
+    common_weak_answers:
+    - 只说“因为老师这样教”
+    - 只报结果，不解释数量关系
+  error_detection:
+    prompt: 如果把女生设为x，还能列方程吗？正确关系是什么？
+    error_example: boys=girls*4/5
+    expected_explanation: 若女生为x，则男生应为5/4x
+  micro_transfer:
+    prompt: 若女生是男生的2/3，总人数50，只列方程。
+    expected_answer: x+2/3*x=50（x为男生）
+    changed_core_feature: 改变分率
+review:
+  math_reviewer: null
+  pedagogy_reviewer: null
+  reviewed_at: null
+  tool_verification_passed: true
+  notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+type_specific:
+  unit_one_object_id: boys
+  corresponding_object_id: girls
+  fraction: 4/5
+  normalized_relationship: girls = boys * 4/5

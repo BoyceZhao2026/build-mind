@@ -1,0 +1,322 @@
+schema_version: '1.0'
+case_id: g6-motion-0002
+status: draft
+scope:
+  subject: 数学
+  grade: 六年级
+  domain: 应用题
+  problem_type: motion
+  subtype: same_direction_catch_up_delayed
+  difficulty: intermediate
+  curriculum_tags:
+  - 行程问题
+  - 追及
+  - 先后出发
+  - 方程
+source:
+  origin: original
+  source_reference: null
+  copyright_status: cleared
+problem:
+  text: 小明先从学校出发步行，每分钟走60米。30分钟后，小华从同一地点骑车沿同一方向追赶，每分钟行90米。小华出发多少分钟后追上小明？
+  question: 求小华出发后的追及时间
+  answer_form: quantity_with_unit
+  has_irrelevant_information: false
+  has_implicit_condition: false
+  implicit_conditions: []
+objects:
+- object_id: ming
+  name: 小明
+  type: person
+  owner: null
+  value: null
+  unit: null
+  role: given
+  source_span: 小明
+- object_id: hua
+  name: 小华
+  type: person
+  owner: null
+  value: null
+  unit: null
+  role: given
+  source_span: 小华
+- object_id: speed_ming
+  name: 小明速度
+  type: speed
+  owner: null
+  value: 60
+  unit: 米/分钟
+  role: given
+  source_span: 每分钟走60米
+- object_id: speed_hua
+  name: 小华速度
+  type: speed
+  owner: null
+  value: 90
+  unit: 米/分钟
+  role: given
+  source_span: 每分钟行90米
+- object_id: head_start
+  name: 提前时间
+  type: time
+  owner: null
+  value: 30
+  unit: 分钟
+  role: given
+  source_span: 30分钟后
+- object_id: catch_time
+  name: 小华追赶时间
+  type: time
+  owner: null
+  value: null
+  unit: 分钟
+  role: unknown
+  source_span: 小华出发多少分钟后
+- object_id: distance_ming
+  name: 小明总路程
+  type: distance
+  owner: null
+  value: null
+  unit: 米
+  role: intermediate
+  source_span: 小明路程
+- object_id: distance_hua
+  name: 小华路程
+  type: distance
+  owner: null
+  value: null
+  unit: 米
+  role: intermediate
+  source_span: 小华路程
+relationships:
+- relationship_id: r1
+  type: distance_formula
+  natural_language: 小华路程=90×追赶时间
+  expression: distance_hua = speed_hua * catch_time
+  operands:
+  - speed_hua
+  - catch_time
+  result: distance_hua
+  required_conditions: []
+- relationship_id: r2
+  type: distance_formula
+  natural_language: 小明总时间比小华多30分钟
+  expression: distance_ming = speed_ming * (catch_time + head_start)
+  operands:
+  - speed_ming
+  - catch_time
+  - head_start
+  result: distance_ming
+  required_conditions: []
+- relationship_id: r3
+  type: difference
+  natural_language: 追上时两人从同一点出发的路程相等
+  expression: distance_hua = distance_ming
+  operands:
+  - distance_hua
+  - distance_ming
+  result: distance_hua
+  required_conditions: []
+unit_one:
+  required: false
+  object_id: null
+  evidence: null
+answer:
+  final_value: 60
+  unit: 分钟
+  accepted_forms:
+  - '60'
+  - 60分钟
+  validation_expression: 90 * 60 = 60 * (60 + 30)
+  internal_only: true
+solution_paths:
+- path_id: path_1
+  method: 分别表示两人的运动时间
+  age_appropriate: true
+  priority: 1
+  prerequisites:
+  - 识别小明多走30分钟
+  steps:
+  - step_id: p1_s1
+    depends_on: []
+    goal: 设追赶时间
+    action: define
+    input_objects:
+    - catch_time
+    output_object: catch_time
+    expression_before: null
+    operation: 设小华出发x分钟后追上
+    expression_after: catch_time=x
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s2
+    depends_on:
+    - p1_s1
+    goal: 表示两人的路程
+    action: build_relation
+    input_objects:
+    - speed_hua
+    - speed_ming
+    - head_start
+    output_object: null
+    expression_before: null
+    operation: 小华90x；小明60(x+30)
+    expression_after: distance_hua=90x; distance_ming=60(x+30)
+    result_value: null
+    unit: null
+    required_understanding: 小明的总运动时间是x+30
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s3
+    depends_on:
+    - p1_s2
+    goal: 利用追上时路程相等列方程
+    action: solve
+    input_objects: []
+    output_object: catch_time
+    expression_before: null
+    operation: 90x=60(x+30)
+    expression_after: x=60
+    result_value: 60
+    unit: 分钟
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 90*60==60*(60+30)
+  - step_id: p1_s4
+    depends_on:
+    - p1_s3
+    goal: 检查两人路程
+    action: check
+    input_objects:
+    - distance_hua
+    - distance_ming
+    output_object: null
+    expression_before: null
+    operation: 均为5400米
+    expression_after: 90*60=60*90=5400
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+solution_graph:
+  nodes:
+  - node_id: n1
+    label: 设小华追赶x分钟
+    object_ids:
+    - catch_time
+  - node_id: n2
+    label: 小明时间x+30
+    object_ids:
+    - head_start
+  - node_id: n3
+    label: 追上时路程相等
+    object_ids:
+    - distance_ming
+    - distance_hua
+  - node_id: n4
+    label: 求解检验
+    object_ids:
+    - catch_time
+  edges:
+  - from: n1
+    to: n2
+  - from: n2
+    to: n3
+  - from: n3
+    to: n4
+  branch_rules: []
+common_errors:
+- error_id: e1
+  type: time_shift
+  student_expression: 90x=60x
+  first_error_span: 60x
+  misconception: 忽略小明提前30分钟
+  diagnostic_question: 追上时小明一共走了x分钟还是x+30分钟？
+  preferred_teaching_action: ACCOUNT_FOR_HEAD_START
+- error_id: e2
+  type: relation
+  student_expression: (90+60)x=60*30
+  first_error_span: 90+60
+  misconception: 追及问题错用速度和
+  diagnostic_question: 两人同向时，缩短差距靠速度和还是速度差？
+  preferred_teaching_action: SELECT_SPEED_DIFFERENCE
+teaching_boundaries:
+  before_student_final_attempt:
+    allowed:
+    - 询问未知量应设为什么
+    - 询问题目中的核心等量关系
+    - 只提示当前一步，不直接给出最终答案
+    forbidden:
+    - 直接输出最终答案
+    - 一次展示完整方程、求解过程和答案
+  after_student_final_attempt:
+    allowed:
+    - 判断答案是否正确
+    - 要求学生解释等量关系
+    - 引导代回检验
+    forbidden: []
+understanding_checks:
+  explain_why:
+    prompt: 为什么小明的路程要写成60(x+30)？
+    key_elements:
+    - 小明提前30分钟
+    - 追赶期间小明仍继续走
+    common_weak_answers:
+    - 只说“因为老师这样教”
+    - 只报结果，不解释数量关系
+  error_detection:
+    prompt: 如果写90x=60x，会漏掉什么？
+    error_example: 90x=60x
+    expected_explanation: 漏掉小明提前30分钟形成的领先路程
+  micro_transfer:
+    prompt: 若小明提前20分钟，其他不变，只列方程。
+    expected_answer: 90x=60(x+20)
+    changed_core_feature: 改变提前时间
+review:
+  math_reviewer: null
+  pedagogy_reviewer: null
+  reviewed_at: null
+  tool_verification_passed: true
+  notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+type_specific:
+  motion_mode: same_direction
+  event: catch_up
+  travelers:
+  - object_id: ming
+    speed_object_id: speed_ming
+    time_object_id: catch_time_plus_head_start
+    distance_object_id: distance_ming
+  - object_id: hua
+    speed_object_id: speed_hua
+    time_object_id: catch_time
+    distance_object_id: distance_hua
+  event_relationship: distance_hua = distance_ming
+  time_offset_minutes: 30

@@ -1,0 +1,292 @@
+schema_version: '1.0'
+case_id: g6-age-0001
+status: draft
+scope:
+  subject: 数学
+  grade: 六年级
+  domain: 应用题
+  problem_type: age
+  subtype: future_multiple
+  difficulty: basic
+  curriculum_tags:
+  - 年龄问题
+  - 未来年龄
+  - 方程
+source:
+  origin: original
+  source_reference: null
+  copyright_status: cleared
+problem:
+  text: 爸爸今年36岁，儿子今年12岁。多少年后爸爸的年龄是儿子的2倍？
+  question: 求多少年后年龄成2倍关系
+  answer_form: quantity_with_unit
+  has_irrelevant_information: false
+  has_implicit_condition: false
+  implicit_conditions: []
+objects:
+- object_id: father_now
+  name: 爸爸当前年龄
+  type: age
+  owner: null
+  value: 36
+  unit: 岁
+  role: given
+  source_span: 爸爸今年36岁
+- object_id: son_now
+  name: 儿子当前年龄
+  type: age
+  owner: null
+  value: 12
+  unit: 岁
+  role: given
+  source_span: 儿子今年12岁
+- object_id: years
+  name: 经过年数
+  type: time
+  owner: null
+  value: null
+  unit: 年
+  role: unknown
+  source_span: 多少年后
+- object_id: father_future
+  name: 爸爸未来年龄
+  type: age
+  owner: null
+  value: null
+  unit: 岁
+  role: intermediate
+  source_span: 爸爸的年龄
+- object_id: son_future
+  name: 儿子未来年龄
+  type: age
+  owner: null
+  value: null
+  unit: 岁
+  role: intermediate
+  source_span: 儿子的年龄
+relationships:
+- relationship_id: r1
+  type: age_shift
+  natural_language: 爸爸未来年龄=36+年数
+  expression: father_future = father_now + years
+  operands:
+  - father_now
+  - years
+  result: father_future
+  required_conditions: []
+- relationship_id: r2
+  type: age_shift
+  natural_language: 儿子未来年龄=12+年数
+  expression: son_future = son_now + years
+  operands:
+  - son_now
+  - years
+  result: son_future
+  required_conditions: []
+- relationship_id: r3
+  type: multiple
+  natural_language: 目标时间点爸爸年龄=2×儿子年龄
+  expression: father_future = 2 * son_future
+  operands:
+  - father_future
+  - son_future
+  result: father_future
+  required_conditions: []
+unit_one:
+  required: false
+  object_id: null
+  evidence: null
+answer:
+  final_value: 12
+  unit: 年
+  accepted_forms:
+  - '12'
+  - 12年
+  validation_expression: 36 + 12 = 2 * (12 + 12)
+  internal_only: true
+solution_paths:
+- path_id: path_1
+  method: 设未来经过x年
+  age_appropriate: true
+  priority: 1
+  prerequisites:
+  - 理解两人的年龄同时增加同样年数
+  steps:
+  - step_id: p1_s1
+    depends_on: []
+    goal: 设时间偏移
+    action: define
+    input_objects:
+    - years
+    output_object: years
+    expression_before: null
+    operation: 设x年后
+    expression_after: years=x
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s2
+    depends_on:
+    - p1_s1
+    goal: 表示两人未来年龄
+    action: build_relation
+    input_objects:
+    - father_now
+    - son_now
+    - years
+    output_object: null
+    expression_before: null
+    operation: 爸爸36+x，儿子12+x
+    expression_after: father_future=36+x; son_future=12+x
+    result_value: null
+    unit: null
+    required_understanding: 经过x年，两人都增加x岁
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s3
+    depends_on:
+    - p1_s2
+    goal: 根据倍数关系列方程并求解
+    action: solve
+    input_objects: []
+    output_object: years
+    expression_before: null
+    operation: 36+x=2(12+x)
+    expression_after: x=12
+    result_value: 12
+    unit: 年
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 36+12==2*(12+12)
+  - step_id: p1_s4
+    depends_on:
+    - p1_s3
+    goal: 检验未来年龄
+    action: check
+    input_objects: []
+    output_object: null
+    expression_before: null
+    operation: 48岁与24岁，正好2倍
+    expression_after: 48=2*24
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+solution_graph:
+  nodes:
+  - node_id: n1
+    label: 设x年后
+    object_ids:
+    - years
+  - node_id: n2
+    label: 两人都+x
+    object_ids:
+    - father_future
+    - son_future
+  - node_id: n3
+    label: 建立2倍关系
+    object_ids:
+    - father_future
+    - son_future
+  - node_id: n4
+    label: 求解检验
+    object_ids:
+    - years
+  edges:
+  - from: n1
+    to: n2
+  - from: n2
+    to: n3
+  - from: n3
+    to: n4
+  branch_rules: []
+common_errors:
+- error_id: e1
+  type: time_shift
+  student_expression: 36+x=2*12
+  first_error_span: 2*12
+  misconception: 只给爸爸年龄加x，没有给儿子加x
+  diagnostic_question: x年后儿子的年龄会不会也变化？
+  preferred_teaching_action: SHIFT_BOTH_AGES
+- error_id: e2
+  type: relation
+  student_expression: 36-12=24，所以12年后
+  first_error_span: '24'
+  misconception: 只看年龄差，未建立目标倍数关系
+  diagnostic_question: 年龄差不变能直接告诉你何时变成2倍吗？
+  preferred_teaching_action: BUILD_TIMED_RATIO
+teaching_boundaries:
+  before_student_final_attempt:
+    allowed:
+    - 询问未知量应设为什么
+    - 询问题目中的核心等量关系
+    - 只提示当前一步，不直接给出最终答案
+    forbidden:
+    - 直接输出最终答案
+    - 一次展示完整方程、求解过程和答案
+  after_student_final_attempt:
+    allowed:
+    - 判断答案是否正确
+    - 要求学生解释等量关系
+    - 引导代回检验
+    forbidden: []
+understanding_checks:
+  explain_why:
+    prompt: 为什么方程两边的年龄都要加x？
+    key_elements:
+    - 同样经过x年
+    - 两个人年龄同时增长
+    common_weak_answers:
+    - 只说“因为老师这样教”
+    - 只报结果，不解释数量关系
+  error_detection:
+    prompt: 36+x=2×12漏掉了什么？
+    error_example: 36+x=2*12
+    expected_explanation: 漏掉儿子x年后的年龄变化
+  micro_transfer:
+    prompt: 若爸爸40岁、儿子15岁，多少年后爸爸2倍，只列方程。
+    expected_answer: 40+x=2(15+x)
+    changed_core_feature: 改变当前年龄
+review:
+  math_reviewer: null
+  pedagogy_reviewer: null
+  reviewed_at: null
+  tool_verification_passed: true
+  notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+type_specific:
+  people:
+  - object_id: father
+    current_age_object_id: father_now
+  - object_id: son
+    current_age_object_id: son_now
+  time_offset:
+    value: null
+    direction: future
+  invariant_relationship: father_age - son_age = 24
+  timed_relationship: father_now + x = 2 * (son_now + x)

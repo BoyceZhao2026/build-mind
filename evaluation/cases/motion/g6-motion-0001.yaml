@@ -1,0 +1,320 @@
+schema_version: '1.0'
+case_id: g6-motion-0001
+status: draft
+scope:
+  subject: 数学
+  grade: 六年级
+  domain: 应用题
+  problem_type: motion
+  subtype: opposite_meet
+  difficulty: basic
+  curriculum_tags:
+  - 行程问题
+  - 相遇
+  - 方程
+source:
+  origin: original
+  source_reference: null
+  copyright_status: cleared
+problem:
+  text: 甲、乙两人同时从相距360米的两地相向而行。甲每分钟走50米，乙每分钟走70米。几分钟后两人相遇？
+  question: 求相遇时间
+  answer_form: quantity_with_unit
+  has_irrelevant_information: false
+  has_implicit_condition: false
+  implicit_conditions: []
+objects:
+- object_id: traveler_a
+  name: 甲
+  type: person
+  owner: null
+  value: null
+  unit: null
+  role: given
+  source_span: 甲
+- object_id: traveler_b
+  name: 乙
+  type: person
+  owner: null
+  value: null
+  unit: null
+  role: given
+  source_span: 乙
+- object_id: speed_a
+  name: 甲速度
+  type: speed
+  owner: null
+  value: 50
+  unit: 米/分钟
+  role: given
+  source_span: 每分钟走50米
+- object_id: speed_b
+  name: 乙速度
+  type: speed
+  owner: null
+  value: 70
+  unit: 米/分钟
+  role: given
+  source_span: 每分钟走70米
+- object_id: time
+  name: 相遇时间
+  type: time
+  owner: null
+  value: null
+  unit: 分钟
+  role: unknown
+  source_span: 几分钟后
+- object_id: distance_total
+  name: 两地距离
+  type: distance
+  owner: null
+  value: 360
+  unit: 米
+  role: given
+  source_span: 相距360米
+- object_id: distance_a
+  name: 甲路程
+  type: distance
+  owner: null
+  value: null
+  unit: 米
+  role: intermediate
+  source_span: 甲走的路程
+- object_id: distance_b
+  name: 乙路程
+  type: distance
+  owner: null
+  value: null
+  unit: 米
+  role: intermediate
+  source_span: 乙走的路程
+relationships:
+- relationship_id: r1
+  type: distance_formula
+  natural_language: 甲路程=甲速度×时间
+  expression: distance_a = speed_a * time
+  operands:
+  - speed_a
+  - time
+  result: distance_a
+  required_conditions: []
+- relationship_id: r2
+  type: distance_formula
+  natural_language: 乙路程=乙速度×时间
+  expression: distance_b = speed_b * time
+  operands:
+  - speed_b
+  - time
+  result: distance_b
+  required_conditions: []
+- relationship_id: r3
+  type: sum
+  natural_language: 相向相遇时两人路程和等于总距离
+  expression: distance_a + distance_b = distance_total
+  operands:
+  - distance_a
+  - distance_b
+  result: distance_total
+  required_conditions: []
+unit_one:
+  required: false
+  object_id: null
+  evidence: null
+answer:
+  final_value: 3
+  unit: 分钟
+  accepted_forms:
+  - '3'
+  - 3分钟
+  validation_expression: 50 * 3 + 70 * 3 = 360
+  internal_only: true
+solution_paths:
+- path_id: path_1
+  method: 设共同运动时间为x
+  age_appropriate: true
+  priority: 1
+  prerequisites:
+  - 理解同时出发且相向相遇
+  steps:
+  - step_id: p1_s1
+    depends_on: []
+    goal: 确定共同时间
+    action: define
+    input_objects:
+    - time
+    output_object: time
+    expression_before: null
+    operation: 设x分钟后相遇
+    expression_after: time=x
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s2
+    depends_on:
+    - p1_s1
+    goal: 分别表示两人路程
+    action: build_relation
+    input_objects:
+    - speed_a
+    - speed_b
+    - time
+    output_object: null
+    expression_before: null
+    operation: 甲50x米，乙70x米
+    expression_after: distance_a=50x; distance_b=70x
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s3
+    depends_on:
+    - p1_s2
+    goal: 利用相遇条件列方程
+    action: solve
+    input_objects:
+    - distance_total
+    output_object: time
+    expression_before: null
+    operation: 50x+70x=360
+    expression_after: x=3
+    result_value: 3
+    unit: 分钟
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 50*3+70*3==360
+  - step_id: p1_s4
+    depends_on:
+    - p1_s3
+    goal: 检验路程和
+    action: check
+    input_objects:
+    - distance_a
+    - distance_b
+    output_object: null
+    expression_before: null
+    operation: 150+210=360
+    expression_after: 150+210=360
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+solution_graph:
+  nodes:
+  - node_id: n1
+    label: 设相遇时间x
+    object_ids:
+    - time
+  - node_id: n2
+    label: 表示甲乙路程
+    object_ids:
+    - distance_a
+    - distance_b
+  - node_id: n3
+    label: 相向相遇路程和=360
+    object_ids:
+    - distance_total
+  - node_id: n4
+    label: 求解检验
+    object_ids:
+    - time
+  edges:
+  - from: n1
+    to: n2
+  - from: n2
+    to: n3
+  - from: n3
+    to: n4
+  branch_rules: []
+common_errors:
+- error_id: e1
+  type: relation
+  student_expression: (70-50)x=360
+  first_error_span: 70-50
+  misconception: 相向相遇错用速度差
+  diagnostic_question: 两个人是朝同一个方向还是彼此靠近？
+  preferred_teaching_action: SELECT_SPEED_SUM
+- error_id: e2
+  type: object_binding
+  student_expression: 50x=360
+  first_error_span: 50x
+  misconception: 只计算甲的路程，忽略乙也在运动
+  diagnostic_question: 相遇前乙有没有走路？
+  preferred_teaching_action: INCLUDE_BOTH_TRAVELERS
+teaching_boundaries:
+  before_student_final_attempt:
+    allowed:
+    - 询问未知量应设为什么
+    - 询问题目中的核心等量关系
+    - 只提示当前一步，不直接给出最终答案
+    forbidden:
+    - 直接输出最终答案
+    - 一次展示完整方程、求解过程和答案
+  after_student_final_attempt:
+    allowed:
+    - 判断答案是否正确
+    - 要求学生解释等量关系
+    - 引导代回检验
+    forbidden: []
+understanding_checks:
+  explain_why:
+    prompt: 为什么相向相遇要把两人的路程相加？
+    key_elements:
+    - 两人共同缩短间距
+    - 相遇时两段路程合成总距离
+    common_weak_answers:
+    - 只说“因为老师这样教”
+    - 只报结果，不解释数量关系
+  error_detection:
+    prompt: 用速度差70-50列方程适合这种相向题吗？为什么？
+    error_example: (70-50)x=360
+    expected_explanation: 速度差适合追及，不适合相向相遇
+  micro_transfer:
+    prompt: 若两地480米，速度仍50和70，只列方程。
+    expected_answer: 50x+70x=480
+    changed_core_feature: 改变总距离
+review:
+  math_reviewer: null
+  pedagogy_reviewer: null
+  reviewed_at: null
+  tool_verification_passed: true
+  notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+type_specific:
+  motion_mode: opposite
+  event: meet
+  travelers:
+  - object_id: traveler_a
+    speed_object_id: speed_a
+    time_object_id: time
+    distance_object_id: distance_a
+  - object_id: traveler_b
+    speed_object_id: speed_b
+    time_object_id: time
+    distance_object_id: distance_b
+  event_relationship: distance_a + distance_b = distance_total

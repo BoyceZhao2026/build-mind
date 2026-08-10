@@ -1,0 +1,255 @@
+schema_version: '1.0'
+case_id: g6-percentage-0002
+status: draft
+scope:
+  subject: 数学
+  grade: 六年级
+  domain: 应用题
+  problem_type: percentage
+  subtype: increase_find_original
+  difficulty: intermediate
+  curriculum_tags:
+  - 百分数
+  - 增长率
+  - 方程
+  - 单位1
+source:
+  origin: original
+  source_reference: null
+  copyright_status: cleared
+problem:
+  text: 学校今年参加科技社团的学生有360人，比去年增加了20%。去年有多少人参加？
+  question: 求去年参加科技社团的人数
+  answer_form: quantity_with_unit
+  has_irrelevant_information: false
+  has_implicit_condition: false
+  implicit_conditions: []
+objects:
+- object_id: last_year
+  name: 去年人数
+  type: amount
+  owner: null
+  value: null
+  unit: 人
+  role: unknown
+  source_span: 去年
+- object_id: this_year
+  name: 今年人数
+  type: amount
+  owner: null
+  value: 360
+  unit: 人
+  role: given
+  source_span: 今年有360人
+- object_id: increase_rate
+  name: 增长率
+  type: other
+  owner: null
+  value: 20%
+  unit: null
+  role: given
+  source_span: 比去年增加了20%
+relationships:
+- relationship_id: r1
+  type: percentage_of
+  natural_language: 今年人数是去年人数的120%
+  expression: this_year = last_year * (1 + 20%)
+  operands:
+  - last_year
+  - increase_rate
+  result: this_year
+  required_conditions: []
+unit_one:
+  required: true
+  object_id: last_year
+  evidence: “比去年增加20%”中的去年人数是比较基准，即单位“1”
+answer:
+  final_value: 300
+  unit: 人
+  accepted_forms:
+  - '300'
+  - 300人
+  validation_expression: 300 * 1.2 = 360
+  internal_only: true
+solution_paths:
+- path_id: path_1
+  method: 设原数量为x的增长率方程
+  age_appropriate: true
+  priority: 1
+  prerequisites:
+  - 理解增加20%后是原来的120%
+  steps:
+  - step_id: p1_s1
+    depends_on: []
+    goal: 找单位1
+    action: identify
+    input_objects:
+    - last_year
+    - increase_rate
+    output_object: last_year
+    expression_before: null
+    operation: 设去年人数x
+    expression_after: last_year=x
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s2
+    depends_on:
+    - p1_s1
+    goal: 把增长关系转成总量关系
+    action: build_relation
+    input_objects:
+    - this_year
+    - increase_rate
+    output_object: null
+    expression_before: null
+    operation: 今年=x+20%x=120%x
+    expression_after: 1.2x=360
+    result_value: null
+    unit: null
+    required_understanding: 增加20%是在原有100%基础上增加
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s3
+    depends_on:
+    - p1_s2
+    goal: 解出去年人数
+    action: solve
+    input_objects: []
+    output_object: last_year
+    expression_before: null
+    operation: 360÷1.2
+    expression_after: x=300
+    result_value: 300
+    unit: 人
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 300*1.2==360
+  - step_id: p1_s4
+    depends_on:
+    - p1_s3
+    goal: 验证增长20%
+    action: check
+    input_objects:
+    - last_year
+    - this_year
+    output_object: null
+    expression_before: null
+    operation: 300增加20%为360
+    expression_after: 300+300*20%=360
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+solution_graph:
+  nodes:
+  - node_id: n1
+    label: 识别去年为单位1
+    object_ids:
+    - last_year
+  - node_id: n2
+    label: 增加20%=120%
+    object_ids:
+    - increase_rate
+  - node_id: n3
+    label: 用今年360列方程
+    object_ids:
+    - this_year
+  - node_id: n4
+    label: 求解检验
+    object_ids:
+    - last_year
+  edges:
+  - from: n1
+    to: n2
+  - from: n2
+    to: n3
+  - from: n3
+    to: n4
+  branch_rules: []
+common_errors:
+- error_id: e1
+  type: percentage_meaning
+  student_expression: 0.2x=360
+  first_error_span: 0.2x
+  misconception: 把今年总人数误当成增加部分
+  diagnostic_question: 360人表示增加的人数还是增加后的总人数？
+  preferred_teaching_action: CLARIFY_TARGET_AMOUNT
+- error_id: e2
+  type: relation
+  student_expression: x=360*(1-20%)
+  first_error_span: 1-20%
+  misconception: 用今年人数直接减少20%倒推，忽略增长基准不同
+  diagnostic_question: 20%是以去年还是今年为基准？
+  preferred_teaching_action: CLARIFY_BASE
+teaching_boundaries:
+  before_student_final_attempt:
+    allowed:
+    - 询问未知量应设为什么
+    - 询问题目中的核心等量关系
+    - 只提示当前一步，不直接给出最终答案
+    forbidden:
+    - 直接输出最终答案
+    - 一次展示完整方程、求解过程和答案
+  after_student_final_attempt:
+    allowed:
+    - 判断答案是否正确
+    - 要求学生解释等量关系
+    - 引导代回检验
+    forbidden: []
+understanding_checks:
+  explain_why:
+    prompt: 为什么“比去年增加20%”对应今年是去年的120%？
+    key_elements:
+    - 去年100%
+    - 增加20%
+    - 合计120%
+    common_weak_answers:
+    - 只说“因为老师这样教”
+    - 只报结果，不解释数量关系
+  error_detection:
+    prompt: 直接算360×80%=288为什么不对？
+    error_example: 360*80%
+    expected_explanation: 增长率20%以去年为基准，不能用今年直接减20%
+  micro_transfer:
+    prompt: 若今年420人，比去年增加40%，只列方程。
+    expected_answer: 1.4x=420
+    changed_core_feature: 改变增长率
+review:
+  math_reviewer: null
+  pedagogy_reviewer: null
+  reviewed_at: null
+  tool_verification_passed: true
+  notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+type_specific:
+  base_object_id: last_year
+  percentage: 20%
+  percentage_role: increase_rate
+  target_object_id: this_year
+  normalized_relationship: this_year = last_year * (1 + 20%)

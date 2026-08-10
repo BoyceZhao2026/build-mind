@@ -1,0 +1,292 @@
+schema_version: '1.0'
+case_id: g6-age-0002
+status: draft
+scope:
+  subject: 数学
+  grade: 六年级
+  domain: 应用题
+  problem_type: age
+  subtype: past_multiple
+  difficulty: intermediate
+  curriculum_tags:
+  - 年龄问题
+  - 过去年龄
+  - 方程
+  - 时间方向
+source:
+  origin: original
+  source_reference: null
+  copyright_status: cleared
+problem:
+  text: 妈妈今年42岁，女儿今年12岁。多少年前妈妈的年龄是女儿的4倍？
+  question: 求多少年前妈妈年龄是女儿4倍
+  answer_form: quantity_with_unit
+  has_irrelevant_information: false
+  has_implicit_condition: false
+  implicit_conditions: []
+objects:
+- object_id: mother_now
+  name: 妈妈当前年龄
+  type: age
+  owner: null
+  value: 42
+  unit: 岁
+  role: given
+  source_span: 妈妈今年42岁
+- object_id: daughter_now
+  name: 女儿当前年龄
+  type: age
+  owner: null
+  value: 12
+  unit: 岁
+  role: given
+  source_span: 女儿今年12岁
+- object_id: years_ago
+  name: 向过去的年数
+  type: time
+  owner: null
+  value: null
+  unit: 年
+  role: unknown
+  source_span: 多少年前
+- object_id: mother_past
+  name: 妈妈过去年龄
+  type: age
+  owner: null
+  value: null
+  unit: 岁
+  role: intermediate
+  source_span: 妈妈的年龄
+- object_id: daughter_past
+  name: 女儿过去年龄
+  type: age
+  owner: null
+  value: null
+  unit: 岁
+  role: intermediate
+  source_span: 女儿的年龄
+relationships:
+- relationship_id: r1
+  type: age_shift
+  natural_language: 妈妈过去年龄=42-x
+  expression: mother_past = mother_now - years_ago
+  operands:
+  - mother_now
+  - years_ago
+  result: mother_past
+  required_conditions: []
+- relationship_id: r2
+  type: age_shift
+  natural_language: 女儿过去年龄=12-x
+  expression: daughter_past = daughter_now - years_ago
+  operands:
+  - daughter_now
+  - years_ago
+  result: daughter_past
+  required_conditions: []
+- relationship_id: r3
+  type: multiple
+  natural_language: 过去某时妈妈年龄=4×女儿年龄
+  expression: mother_past = 4 * daughter_past
+  operands:
+  - mother_past
+  - daughter_past
+  result: mother_past
+  required_conditions: []
+unit_one:
+  required: false
+  object_id: null
+  evidence: null
+answer:
+  final_value: 2
+  unit: 年
+  accepted_forms:
+  - '2'
+  - 2年前
+  validation_expression: 42 - 2 = 4 * (12 - 2)
+  internal_only: true
+solution_paths:
+- path_id: path_1
+  method: 设x年前并同步减去x
+  age_appropriate: true
+  priority: 1
+  prerequisites:
+  - 正确识别“年前”对应减法
+  steps:
+  - step_id: p1_s1
+    depends_on: []
+    goal: 设过去时间
+    action: define
+    input_objects:
+    - years_ago
+    output_object: years_ago
+    expression_before: null
+    operation: 设x年前
+    expression_after: years_ago=x
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s2
+    depends_on:
+    - p1_s1
+    goal: 表示两人过去年龄
+    action: build_relation
+    input_objects:
+    - mother_now
+    - daughter_now
+    output_object: null
+    expression_before: null
+    operation: 妈妈42-x，女儿12-x
+    expression_after: mother_past=42-x; daughter_past=12-x
+    result_value: null
+    unit: null
+    required_understanding: 回到x年前，两个人都减少x岁
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s3
+    depends_on:
+    - p1_s2
+    goal: 建立4倍方程并求解
+    action: solve
+    input_objects: []
+    output_object: years_ago
+    expression_before: null
+    operation: 42-x=4(12-x)
+    expression_after: x=2
+    result_value: 2
+    unit: 年
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 42-2==4*(12-2)
+  - step_id: p1_s4
+    depends_on:
+    - p1_s3
+    goal: 检验过去年龄
+    action: check
+    input_objects: []
+    output_object: null
+    expression_before: null
+    operation: 40岁与10岁，正好4倍
+    expression_after: 40=4*10
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+solution_graph:
+  nodes:
+  - node_id: n1
+    label: 设x年前
+    object_ids:
+    - years_ago
+  - node_id: n2
+    label: 两人年龄都-x
+    object_ids:
+    - mother_past
+    - daughter_past
+  - node_id: n3
+    label: 建立过去4倍关系
+    object_ids:
+    - mother_past
+    - daughter_past
+  - node_id: n4
+    label: 求解检验
+    object_ids:
+    - years_ago
+  edges:
+  - from: n1
+    to: n2
+  - from: n2
+    to: n3
+  - from: n3
+    to: n4
+  branch_rules: []
+common_errors:
+- error_id: e1
+  type: time_shift
+  student_expression: 42+x=4(12+x)
+  first_error_span: +x
+  misconception: 把“年前”写成未来年龄
+  diagnostic_question: “年前”应该比现在年龄大还是小？
+  preferred_teaching_action: CLARIFY_TIME_DIRECTION
+- error_id: e2
+  type: time_shift
+  student_expression: 42-x=4*12
+  first_error_span: 4*12
+  misconception: 只改变妈妈年龄，女儿年龄未同步变化
+  diagnostic_question: x年前女儿是不是也年轻x岁？
+  preferred_teaching_action: SHIFT_BOTH_AGES
+teaching_boundaries:
+  before_student_final_attempt:
+    allowed:
+    - 询问未知量应设为什么
+    - 询问题目中的核心等量关系
+    - 只提示当前一步，不直接给出最终答案
+    forbidden:
+    - 直接输出最终答案
+    - 一次展示完整方程、求解过程和答案
+  after_student_final_attempt:
+    allowed:
+    - 判断答案是否正确
+    - 要求学生解释等量关系
+    - 引导代回检验
+    forbidden: []
+understanding_checks:
+  explain_why:
+    prompt: 为什么“x年前”两个人的年龄都要减x？
+    key_elements:
+    - 时间同时倒退
+    - 年龄差保持不变
+    common_weak_answers:
+    - 只说“因为老师这样教”
+    - 只报结果，不解释数量关系
+  error_detection:
+    prompt: 方程42+x=4(12+x)描述的是过去还是未来？
+    error_example: 42+x=4(12+x)
+    expected_explanation: 这是x年后的关系，不是x年前
+  micro_transfer:
+    prompt: 若妈妈45岁、女儿15岁，问几年前妈妈4倍，只列方程。
+    expected_answer: 45-x=4(15-x)
+    changed_core_feature: 改变当前年龄
+review:
+  math_reviewer: null
+  pedagogy_reviewer: null
+  reviewed_at: null
+  tool_verification_passed: true
+  notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+type_specific:
+  people:
+  - object_id: mother
+    current_age_object_id: mother_now
+  - object_id: daughter
+    current_age_object_id: daughter_now
+  time_offset:
+    value: null
+    direction: past
+  invariant_relationship: mother_age - daughter_age = 30
+  timed_relationship: mother_now - x = 4 * (daughter_now - x)

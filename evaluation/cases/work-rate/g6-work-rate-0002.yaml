@@ -1,0 +1,307 @@
+schema_version: '1.0'
+case_id: g6-work-rate-0002
+status: draft
+scope:
+  subject: 数学
+  grade: 六年级
+  domain: 应用题
+  problem_type: work_rate
+  subtype: together_then_single
+  difficulty: intermediate
+  curriculum_tags:
+  - 工程问题
+  - 分阶段
+  - 合作效率
+  - 方程
+source:
+  origin: original
+  source_reference: null
+  copyright_status: cleared
+problem:
+  text: 一项工程，甲单独做8天完成，乙单独做12天完成。两人先合作3天，剩下的由甲单独完成。甲还需要多少天？
+  question: 求合作3天后甲单独完成剩余工程所需时间
+  answer_form: quantity_with_unit
+  has_irrelevant_information: false
+  has_implicit_condition: false
+  implicit_conditions: []
+objects:
+- object_id: total_work
+  name: 总工作量
+  type: work
+  owner: null
+  value: 1
+  unit: null
+  role: given
+  source_span: 一项工程
+- object_id: time_a
+  name: 甲单独完成时间
+  type: time
+  owner: null
+  value: 8
+  unit: 天
+  role: given
+  source_span: 8天完成
+- object_id: time_b
+  name: 乙单独完成时间
+  type: time
+  owner: null
+  value: 12
+  unit: 天
+  role: given
+  source_span: 12天完成
+- object_id: together_days
+  name: 合作天数
+  type: time
+  owner: null
+  value: 3
+  unit: 天
+  role: given
+  source_span: 先合作3天
+- object_id: eff_a
+  name: 甲效率
+  type: other
+  owner: null
+  value: 1/8
+  unit: 工程/天
+  role: intermediate
+  source_span: 甲单独8天
+- object_id: eff_b
+  name: 乙效率
+  type: other
+  owner: null
+  value: 1/12
+  unit: 工程/天
+  role: intermediate
+  source_span: 乙单独12天
+- object_id: remaining_a_days
+  name: 甲剩余单做时间
+  type: time
+  owner: null
+  value: null
+  unit: 天
+  role: unknown
+  source_span: 甲还需要多少天
+relationships:
+- relationship_id: r1
+  type: work_formula
+  natural_language: 合作3天完成量=3×(1/8+1/12)
+  expression: together_done = 3 * (1/8 + 1/12)
+  operands:
+  - eff_a
+  - eff_b
+  - together_days
+  result: together_done
+  required_conditions: []
+- relationship_id: r2
+  type: work_formula
+  natural_language: 合作完成量+甲后续完成量=总工作量
+  expression: 3*(1/8+1/12) + (1/8)*remaining_a_days = 1
+  operands:
+  - remaining_a_days
+  result: total_work
+  required_conditions: []
+unit_one:
+  required: true
+  object_id: total_work
+  evidence: 整项工程可设为1
+answer:
+  final_value: 3
+  unit: 天
+  accepted_forms:
+  - '3'
+  - 3天
+  validation_expression: 3*(1/8+1/12) + 3*(1/8) = 1
+  internal_only: true
+solution_paths:
+- path_id: path_1
+  method: 分阶段工作量方程
+  age_appropriate: true
+  priority: 1
+  prerequisites:
+  - 能区分合作阶段和单独阶段
+  steps:
+  - step_id: p1_s1
+    depends_on: []
+    goal: 求甲乙效率
+    action: identify
+    input_objects:
+    - time_a
+    - time_b
+    output_object: null
+    expression_before: null
+    operation: 甲1/8，乙1/12
+    expression_after: eff_a=1/8; eff_b=1/12
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s2
+    depends_on:
+    - p1_s1
+    goal: 表示合作3天完成量
+    action: multiply
+    input_objects:
+    - eff_a
+    - eff_b
+    - together_days
+    output_object: null
+    expression_before: null
+    operation: 3×(1/8+1/12)=5/8
+    expression_after: together_done=5/8
+    result_value: 5/8
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s3
+    depends_on:
+    - p1_s2
+    goal: 设甲后续时间并列总工作量方程
+    action: build_relation
+    input_objects:
+    - remaining_a_days
+    - eff_a
+    - total_work
+    output_object: null
+    expression_before: null
+    operation: 设x天，5/8+x/8=1
+    expression_after: 5/8+x/8=1
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s4
+    depends_on:
+    - p1_s3
+    goal: 解方程并检验
+    action: solve
+    input_objects: []
+    output_object: remaining_a_days
+    expression_before: null
+    operation: x/8=3/8
+    expression_after: x=3
+    result_value: 3
+    unit: 天
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 3*(1/8+1/12)+3/8==1
+solution_graph:
+  nodes:
+  - node_id: n1
+    label: 求两人效率
+    object_ids:
+    - eff_a
+    - eff_b
+  - node_id: n2
+    label: 算合作3天完成量
+    object_ids:
+    - together_days
+  - node_id: n3
+    label: 表示甲后续完成量
+    object_ids:
+    - remaining_a_days
+  - node_id: n4
+    label: 总工作量=1列方程
+    object_ids:
+    - total_work
+  edges:
+  - from: n1
+    to: n2
+  - from: n2
+    to: n3
+  - from: n3
+    to: n4
+  branch_rules: []
+common_errors:
+- error_id: e1
+  type: unit
+  student_expression: 3*(1/8+1/12)=5/8，所以还要3/8天
+  first_error_span: 3/8天
+  misconception: 把剩余工作量3/8直接当成时间
+  diagnostic_question: 3/8表示“工程量”还是“天数”？
+  preferred_teaching_action: DISTINGUISH_WORK_AND_TIME
+- error_id: e2
+  type: object_binding
+  student_expression: 5/8 + x/12 = 1
+  first_error_span: x/12
+  misconception: 剩余由甲完成却使用乙效率
+  diagnostic_question: 最后是谁单独完成？甲每天完成几分之一？
+  preferred_teaching_action: BIND_WORKER_EFFICIENCY
+teaching_boundaries:
+  before_student_final_attempt:
+    allowed:
+    - 询问未知量应设为什么
+    - 询问题目中的核心等量关系
+    - 只提示当前一步，不直接给出最终答案
+    forbidden:
+    - 直接输出最终答案
+    - 一次展示完整方程、求解过程和答案
+  after_student_final_attempt:
+    allowed:
+    - 判断答案是否正确
+    - 要求学生解释等量关系
+    - 引导代回检验
+    forbidden: []
+understanding_checks:
+  explain_why:
+    prompt: 为什么合作3天后剩下3/8工程，但甲还要3天而不是3/8天？
+    key_elements:
+    - 3/8是工作量
+    - 甲效率1/8/天
+    - 时间=工作量÷效率
+    common_weak_answers:
+    - 只说“因为老师这样教”
+    - 只报结果，不解释数量关系
+  error_detection:
+    prompt: 若最后写成x/12，错在哪里？
+    error_example: 5/8+x/12=1
+    expected_explanation: 最后阶段由甲做，应使用甲效率1/8
+  micro_transfer:
+    prompt: 若合作2天后由甲完成，只列方程。
+    expected_answer: 2*(1/8+1/12)+x/8=1
+    changed_core_feature: 改变合作阶段时间
+review:
+  math_reviewer: null
+  pedagogy_reviewer: null
+  reviewed_at: null
+  tool_verification_passed: true
+  notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+type_specific:
+  total_work_object_id: total_work
+  total_work_normalized_value: 1
+  workers:
+  - object_id: worker_a
+    solo_time: 8
+    efficiency_expression: 1/8
+  - object_id: worker_b
+    solo_time: 12
+    efficiency_expression: 1/12
+  combined_efficiency_expression: 1/8 + 1/12
+  stages:
+  - 合作3天
+  - 甲单独完成剩余

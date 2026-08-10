@@ -1,0 +1,4015 @@
+cases:
+- schema_version: '1.0'
+  case_id: g6-sum-difference-0001
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: sum_difference
+    subtype: total_and_difference
+    difficulty: basic
+    curriculum_tags:
+    - 和差问题
+    - 方程
+    - 等量关系
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 图书角有故事书和科技书共84本，科技书比故事书多18本。故事书和科技书各有多少本？
+    question: 求故事书和科技书各有多少本
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: story_books
+    name: 故事书
+    type: amount
+    owner: null
+    value: null
+    unit: 本
+    role: unknown
+    source_span: 故事书
+  - object_id: science_books
+    name: 科技书
+    type: amount
+    owner: null
+    value: null
+    unit: 本
+    role: unknown
+    source_span: 科技书
+  - object_id: total_books
+    name: 总本数
+    type: amount
+    owner: null
+    value: 84
+    unit: 本
+    role: given
+    source_span: 共84本
+  - object_id: difference
+    name: 相差本数
+    type: amount
+    owner: null
+    value: 18
+    unit: 本
+    role: given
+    source_span: 多18本
+  relationships:
+  - relationship_id: r1
+    type: sum
+    natural_language: 故事书与科技书合计84本
+    expression: story_books + science_books = total_books
+    operands:
+    - story_books
+    - science_books
+    result: total_books
+    required_conditions: []
+  - relationship_id: r2
+    type: difference
+    natural_language: 科技书比故事书多18本
+    expression: science_books - story_books = difference
+    operands:
+    - science_books
+    - story_books
+    result: difference
+    required_conditions: []
+  unit_one:
+    required: false
+    object_id: null
+    evidence: null
+  answer:
+    final_value:
+      story_books: 33
+      science_books: 51
+    unit: 本
+    accepted_forms:
+    - 故事书33本，科技书51本
+    - 33本和51本
+    validation_expression: 33 + 51 = 84; 51 - 33 = 18
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 设较小量为 x 的方程法
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 理解较大量=较小量+相差数
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 确定未知量并表示另一量
+      action: define
+      input_objects:
+      - story_books
+      - difference
+      output_object: science_books
+      expression_before: null
+      operation: 设故事书为 x 本，则科技书为 x+18 本
+      expression_after: science_books = x + 18
+      result_value: null
+      unit: null
+      required_understanding: 同一个 x 表示较小量，较大量要多18本
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 根据总数建立方程
+      action: build_relation
+      input_objects:
+      - story_books
+      - science_books
+      - total_books
+      output_object: null
+      expression_before: null
+      operation: 两种书的数量和等于84
+      expression_after: x + (x + 18) = 84
+      result_value: null
+      unit: null
+      required_understanding: 总数关系提供等号两边相等的依据
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 解出故事书数量
+      action: solve
+      input_objects: []
+      output_object: story_books
+      expression_before: x + (x + 18) = 84
+      operation: 解一元一次方程
+      expression_after: x = 33
+      result_value: 33
+      unit: 本
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 33 + (33 + 18) == 84
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 求科技书并检验
+      action: check
+      input_objects:
+      - story_books
+      - difference
+      output_object: science_books
+      expression_before: null
+      operation: 33+18=51，并检查和与差
+      expression_after: science_books = 51
+      result_value: 51
+      unit: 本
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 33 + 51 == 84 and 51 - 33 == 18
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 设故事书为x
+      object_ids:
+      - story_books
+    - node_id: n2
+      label: 表示科技书
+      object_ids:
+      - science_books
+      - difference
+    - node_id: n3
+      label: 利用总数列方程
+      object_ids:
+      - total_books
+    - node_id: n4
+      label: 求解并代回检验
+      object_ids:
+      - story_books
+      - science_books
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: relation
+    student_expression: x + 18 = 84
+    first_error_span: x + 18
+    misconception: 把总数误当成“科技书数量”
+    diagnostic_question: 84本表示一种书的数量还是两种书的总数？
+    preferred_teaching_action: CLARIFY_TOTAL
+  - error_id: e2
+    type: object_binding
+    student_expression: x + (x - 18) = 84
+    first_error_span: x - 18
+    misconception: 把“科技书比故事书多18本”的方向写反
+    diagnostic_question: 哪一种书更多？如果故事书是x，科技书应该比x大还是小？
+    preferred_teaching_action: CLARIFY_DIFFERENCE_DIRECTION
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么设故事书为x后，科技书要写成x+18？
+      key_elements:
+      - 科技书更多
+      - 相差18本
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 小华列出 x+(x-18)=84，这里哪里错了？
+      error_example: x + (x - 18) = 84
+      expected_explanation: 把“科技书更多”写成了更少18本
+    micro_transfer:
+      prompt: 如果总数改成100本、相差仍是18本，只列方程不求解。
+      expected_answer: x + (x + 18) = 100
+      changed_core_feature: 改变总数，保持和差关系
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    larger_object_id: science_books
+    smaller_object_id: story_books
+    total_object_id: total_books
+    difference_object_id: difference
+    relationship_expressions:
+    - science_books + story_books = total_books
+    - science_books - story_books = difference
+- schema_version: '1.0'
+  case_id: g6-sum-difference-0002
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: sum_difference
+    subtype: total_and_difference
+    difficulty: intermediate
+    curriculum_tags:
+    - 和差问题
+    - 方程
+    - 对象绑定
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 六年级一班和二班共植树126棵，一班比二班多24棵。两个班各植树多少棵？
+    question: 求一班和二班各植树多少棵
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: class2
+    name: 二班植树数
+    type: amount
+    owner: null
+    value: null
+    unit: 棵
+    role: unknown
+    source_span: 二班
+  - object_id: class1
+    name: 一班植树数
+    type: amount
+    owner: null
+    value: null
+    unit: 棵
+    role: unknown
+    source_span: 一班
+  - object_id: total
+    name: 总植树数
+    type: amount
+    owner: null
+    value: 126
+    unit: 棵
+    role: given
+    source_span: 共植树126棵
+  - object_id: diff
+    name: 相差数
+    type: amount
+    owner: null
+    value: 24
+    unit: 棵
+    role: given
+    source_span: 多24棵
+  relationships:
+  - relationship_id: r1
+    type: sum
+    natural_language: 两班植树总数为126
+    expression: class1 + class2 = total
+    operands:
+    - class1
+    - class2
+    result: total
+    required_conditions: []
+  - relationship_id: r2
+    type: difference
+    natural_language: 一班比二班多24棵
+    expression: class1 - class2 = diff
+    operands:
+    - class1
+    - class2
+    result: diff
+    required_conditions: []
+  unit_one:
+    required: false
+    object_id: null
+    evidence: null
+  answer:
+    final_value:
+      class1: 75
+      class2: 51
+    unit: 棵
+    accepted_forms:
+    - 一班75棵，二班51棵
+    - 75棵和51棵
+    validation_expression: 75 + 51 = 126; 75 - 51 = 24
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 设二班为 x 的方程法
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 识别一班是较大量
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 设二班数量并表示一班
+      action: define
+      input_objects:
+      - class2
+      - diff
+      output_object: class1
+      expression_before: null
+      operation: 设二班x棵，一班x+24棵
+      expression_after: class1=x+24
+      result_value: null
+      unit: null
+      required_understanding: 一班比二班多24
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 用总数列方程
+      action: build_relation
+      input_objects:
+      - class1
+      - class2
+      - total
+      output_object: null
+      expression_before: null
+      operation: 两班合计126
+      expression_after: x+(x+24)=126
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 解方程
+      action: solve
+      input_objects: []
+      output_object: class2
+      expression_before: x+(x+24)=126
+      operation: 解方程
+      expression_after: x=51
+      result_value: 51
+      unit: 棵
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 51+(51+24)==126
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 求一班并检验
+      action: check
+      input_objects:
+      - class2
+      - diff
+      output_object: class1
+      expression_before: null
+      operation: 51+24=75
+      expression_after: class1=75
+      result_value: 75
+      unit: 棵
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 75+51==126 and 75-51==24
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 设二班x
+      object_ids:
+      - class2
+    - node_id: n2
+      label: 表示一班
+      object_ids:
+      - class1
+      - diff
+    - node_id: n3
+      label: 按总数列方程
+      object_ids:
+      - total
+    - node_id: n4
+      label: 求解检验
+      object_ids:
+      - class1
+      - class2
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: object_binding
+    student_expression: (126-24)/2 = 75
+    first_error_span: '75'
+    misconception: 公式计算后把较小量与较大量对应反
+    diagnostic_question: 减去相差数再除以2求到的是较大还是较小？
+    preferred_teaching_action: CHECK_OBJECT_BINDING
+  - error_id: e2
+    type: relation
+    student_expression: x + 24 = 126
+    first_error_span: x + 24
+    misconception: 遗漏另一个班的数量
+    diagnostic_question: 126棵包含几个班？
+    preferred_teaching_action: CLARIFY_TOTAL
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么不能用x+24=126？
+      key_elements:
+      - 126是两班总数
+      - 必须把两个班都计入
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 有人算(126-24)÷2=51，却说51是一班，错在哪里？
+      error_example: (126-24)/2=51
+      expected_explanation: 51是较小量二班，不是一班
+    micro_transfer:
+      prompt: 若一班比二班多30棵、总数仍126，只列方程。
+      expected_answer: x+(x+30)=126
+      changed_core_feature: 改变差值
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    larger_object_id: class1
+    smaller_object_id: class2
+    total_object_id: total
+    difference_object_id: diff
+    relationship_expressions:
+    - class1 + class2 = total
+    - class1 - class2 = diff
+- schema_version: '1.0'
+  case_id: g6-multiple-0001
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: multiple
+    subtype: is_times_total
+    difficulty: basic
+    curriculum_tags:
+    - 倍数问题
+    - 方程
+    - 1倍量
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 体育室有篮球和足球共48个，篮球的数量是足球的3倍。篮球和足球各有多少个？
+    question: 求篮球和足球各有多少个
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: football
+    name: 足球数量
+    type: amount
+    owner: null
+    value: null
+    unit: 个
+    role: unknown
+    source_span: 足球
+  - object_id: basketball
+    name: 篮球数量
+    type: amount
+    owner: null
+    value: null
+    unit: 个
+    role: unknown
+    source_span: 篮球
+  - object_id: multiplier
+    name: 倍数
+    type: other
+    owner: null
+    value: 3
+    unit: null
+    role: given
+    source_span: 3倍
+  - object_id: total
+    name: 球总数
+    type: amount
+    owner: null
+    value: 48
+    unit: 个
+    role: given
+    source_span: 共48个
+  relationships:
+  - relationship_id: r1
+    type: multiple
+    natural_language: 篮球是足球的3倍
+    expression: basketball = football * 3
+    operands:
+    - football
+    - multiplier
+    result: basketball
+    required_conditions: []
+  - relationship_id: r2
+    type: sum
+    natural_language: 两种球共48个
+    expression: basketball + football = total
+    operands:
+    - basketball
+    - football
+    result: total
+    required_conditions: []
+  unit_one:
+    required: false
+    object_id: null
+    evidence: null
+  answer:
+    final_value:
+      football: 12
+      basketball: 36
+    unit: 个
+    accepted_forms:
+    - 足球12个，篮球36个
+    validation_expression: 12 + 36 = 48; 36 = 12 * 3
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 设1倍量为x的方程法
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 能识别足球是1倍量
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 确定1倍量
+      action: identify
+      input_objects:
+      - football
+      - basketball
+      - multiplier
+      output_object: football
+      expression_before: null
+      operation: 足球是1倍量，设为x
+      expression_after: football=x
+      result_value: null
+      unit: null
+      required_understanding: “篮球是足球的3倍”中足球是标准量
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 表示比较量
+      action: define
+      input_objects:
+      - football
+      - multiplier
+      output_object: basketball
+      expression_before: null
+      operation: 篮球为3x
+      expression_after: basketball=3x
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 用总数列方程并求解
+      action: solve
+      input_objects:
+      - total
+      output_object: football
+      expression_before: null
+      operation: x+3x=48
+      expression_after: x=12
+      result_value: 12
+      unit: 个
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 12+3*12==48
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 求篮球并检验
+      action: check
+      input_objects:
+      - football
+      - multiplier
+      output_object: basketball
+      expression_before: null
+      operation: 3×12=36
+      expression_after: basketball=36
+      result_value: 36
+      unit: 个
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 36==12*3
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 识别1倍量
+      object_ids:
+      - football
+    - node_id: n2
+      label: 表示3倍量
+      object_ids:
+      - basketball
+    - node_id: n3
+      label: 总数列方程
+      object_ids:
+      - total
+    - node_id: n4
+      label: 求解检验
+      object_ids:
+      - football
+      - basketball
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: object_binding
+    student_expression: basketball=x, football=3x
+    first_error_span: football=3x
+    misconception: 把标准量和比较量颠倒
+    diagnostic_question: “谁是谁的3倍”里谁是1倍量？
+    preferred_teaching_action: IDENTIFY_BASE_AMOUNT
+  - error_id: e2
+    type: operation
+    student_expression: x+3=48
+    first_error_span: '+3'
+    misconception: 把3倍当成多3个
+    diagnostic_question: 3倍表示乘3还是加3？
+    preferred_teaching_action: CLARIFY_MULTIPLIER
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么足球适合设为x，而篮球写成3x？
+      key_elements:
+      - 足球是1倍量
+      - 篮球是比较量
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 小明写x+3=48，他把哪个词理解错了？
+      error_example: x+3=48
+      expected_explanation: “3倍”不是“多3个”
+    micro_transfer:
+      prompt: 若篮球是足球4倍、总数50个，只列方程。
+      expected_answer: x+4x=50
+      changed_core_feature: 改变倍数
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    base_object_id: football
+    compared_object_id: basketball
+    multiplier: 3
+    phrase_type: is_times
+    normalized_relationship: basketball = football * 3
+- schema_version: '1.0'
+  case_id: g6-multiple-0002
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: multiple
+    subtype: more_than_by_times
+    difficulty: intermediate
+    curriculum_tags:
+    - 倍数问题
+    - 多几倍
+    - 语言辨析
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 图书馆里科技书比故事书多2倍，两类书一共有80本。科技书和故事书各有多少本？
+    question: 求科技书和故事书各有多少本
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: story
+    name: 故事书数量
+    type: amount
+    owner: null
+    value: null
+    unit: 本
+    role: unknown
+    source_span: 故事书
+  - object_id: science
+    name: 科技书数量
+    type: amount
+    owner: null
+    value: null
+    unit: 本
+    role: unknown
+    source_span: 科技书
+  - object_id: times_more
+    name: 多出的倍数
+    type: other
+    owner: null
+    value: 2
+    unit: null
+    role: given
+    source_span: 多2倍
+  - object_id: total
+    name: 总数
+    type: amount
+    owner: null
+    value: 80
+    unit: 本
+    role: given
+    source_span: 一共有80本
+  relationships:
+  - relationship_id: r1
+    type: multiple
+    natural_language: 科技书比故事书多2倍，即科技书是故事书的3倍
+    expression: science = story * (1 + 2)
+    operands:
+    - story
+    - times_more
+    result: science
+    required_conditions: []
+  - relationship_id: r2
+    type: sum
+    natural_language: 两类书共80本
+    expression: science + story = total
+    operands:
+    - science
+    - story
+    result: total
+    required_conditions: []
+  unit_one:
+    required: false
+    object_id: null
+    evidence: null
+  answer:
+    final_value:
+      story: 20
+      science: 60
+    unit: 本
+    accepted_forms:
+    - 故事书20本，科技书60本
+    validation_expression: 20 + 60 = 80; 60 = 20 * 3
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 先规范化“多2倍”再列方程
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 理解“比A多2倍”=A+2A=3A
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 解释“多2倍”
+      action: identify
+      input_objects:
+      - story
+      - times_more
+      output_object: science
+      expression_before: null
+      operation: 科技书=故事书+故事书的2倍
+      expression_after: science=3*story
+      result_value: null
+      unit: null
+      required_understanding: “多2倍”包含原来的1倍
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 设标准量并列方程
+      action: build_relation
+      input_objects:
+      - story
+      - science
+      - total
+      output_object: null
+      expression_before: null
+      operation: 设故事书x本，则科技书3x本，总数80
+      expression_after: x+3x=80
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 求故事书
+      action: solve
+      input_objects: []
+      output_object: story
+      expression_before: null
+      operation: 解4x=80
+      expression_after: x=20
+      result_value: 20
+      unit: 本
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 20+3*20==80
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 求科技书并检验
+      action: check
+      input_objects:
+      - story
+      output_object: science
+      expression_before: null
+      operation: 3×20=60
+      expression_after: science=60
+      result_value: 60
+      unit: 本
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 辨析“多2倍”
+      object_ids:
+      - times_more
+    - node_id: n2
+      label: 设故事书x
+      object_ids:
+      - story
+    - node_id: n3
+      label: 表示科技书3x
+      object_ids:
+      - science
+    - node_id: n4
+      label: 列方程并求解
+      object_ids:
+      - total
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: relation
+    student_expression: science=2x
+    first_error_span: 2x
+    misconception: 把“多2倍”误当“是2倍”
+    diagnostic_question: 原来有1倍，再“多2倍”，一共是几倍？
+    preferred_teaching_action: CLARIFY_MORE_THAN_TIMES
+  - error_id: e2
+    type: operation
+    student_expression: science=x+2
+    first_error_span: '+2'
+    misconception: 把倍数当数量差
+    diagnostic_question: 题目说多2“倍”还是多2“本”？
+    preferred_teaching_action: CLARIFY_UNIT
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么“比故事书多2倍”要表示成3x？
+      key_elements:
+      - 原有1x
+      - 多出2x
+      - 合计3x
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 如果写成2x，会把哪一部分漏掉？
+      error_example: science=2x
+      expected_explanation: 漏掉了科技书中与故事书相等的原1倍
+    micro_transfer:
+      prompt: 若改成“科技书是故事书的2倍”，总数80，只列方程。
+      expected_answer: x+2x=80
+      changed_core_feature: 把“多2倍”改为“是2倍”
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    base_object_id: story
+    compared_object_id: science
+    multiplier: 2
+    phrase_type: more_than_by_times
+    normalized_relationship: science = story * (1 + 2)
+- schema_version: '1.0'
+  case_id: g6-fraction-0001
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: fraction
+    subtype: remaining_known_find_unit_one
+    difficulty: basic
+    curriculum_tags:
+    - 分数应用题
+    - 单位1
+    - 方程
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 一本书已经看了全书的3/5，还剩96页没有看。这本书一共有多少页？
+    question: 求这本书的总页数
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: total_pages
+    name: 全书页数
+    type: amount
+    owner: null
+    value: null
+    unit: 页
+    role: unknown
+    source_span: 全书
+  - object_id: read_pages
+    name: 已看页数
+    type: amount
+    owner: null
+    value: null
+    unit: 页
+    role: intermediate
+    source_span: 看了全书的3/5
+  - object_id: remaining_pages
+    name: 剩余页数
+    type: amount
+    owner: null
+    value: 96
+    unit: 页
+    role: given
+    source_span: 还剩96页
+  - object_id: read_fraction
+    name: 已看分率
+    type: other
+    owner: null
+    value: 3/5
+    unit: null
+    role: given
+    source_span: 3/5
+  relationships:
+  - relationship_id: r1
+    type: fraction_of
+    natural_language: 已看页数是全书的3/5
+    expression: read_pages = total_pages * 3/5
+    operands:
+    - total_pages
+    - read_fraction
+    result: read_pages
+    required_conditions: []
+  - relationship_id: r2
+    type: sum
+    natural_language: 已看页数加剩余页数等于全书
+    expression: read_pages + remaining_pages = total_pages
+    operands:
+    - read_pages
+    - remaining_pages
+    result: total_pages
+    required_conditions: []
+  unit_one:
+    required: true
+    object_id: total_pages
+    evidence: “全书的3/5”说明全书是单位“1”
+  answer:
+    final_value: 240
+    unit: 页
+    accepted_forms:
+    - '240'
+    - 240页
+    validation_expression: 240 * (1 - 3/5) = 96
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 设单位“1”为x的方程法
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 能找准全书是单位1
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 确定单位1
+      action: identify
+      input_objects:
+      - total_pages
+      - read_fraction
+      output_object: total_pages
+      expression_before: null
+      operation: 把全书设为x页
+      expression_after: total_pages=x
+      result_value: null
+      unit: null
+      required_understanding: 分率3/5作用于全书
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 表示已看与剩余
+      action: build_relation
+      input_objects:
+      - read_fraction
+      - remaining_pages
+      output_object: null
+      expression_before: null
+      operation: 已看3/5x，剩余x-3/5x=96
+      expression_after: x - 3/5*x = 96
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 解出总页数
+      action: solve
+      input_objects: []
+      output_object: total_pages
+      expression_before: null
+      operation: 解2/5x=96
+      expression_after: x=240
+      result_value: 240
+      unit: 页
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 240*(1-3/5)==96
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 代回检验
+      action: check
+      input_objects:
+      - total_pages
+      - read_fraction
+      - remaining_pages
+      output_object: null
+      expression_before: null
+      operation: 240的2/5是96
+      expression_after: 240*(2/5)=96
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 确定单位1
+      object_ids:
+      - total_pages
+    - node_id: n2
+      label: 表示已看3/5x
+      object_ids:
+      - read_pages
+    - node_id: n3
+      label: 用剩余96列方程
+      object_ids:
+      - remaining_pages
+    - node_id: n4
+      label: 求解检验
+      object_ids:
+      - total_pages
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: unit_one
+    student_expression: 96 ÷ 3/5
+    first_error_span: 3/5
+    misconception: 把96页错当作3/5对应量
+    diagnostic_question: 96页是“已看”还是“剩下”的部分？
+    preferred_teaching_action: IDENTIFY_FRACTION_PART
+  - error_id: e2
+    type: operation
+    student_expression: x - 3/5 = 96
+    first_error_span: 3/5
+    misconception: 把分率直接从页数中相减
+    diagnostic_question: 3/5表示页数还是全书的一部分比例？
+    preferred_teaching_action: CLARIFY_FRACTION_MEANING
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么96页对应全书的2/5，而不是3/5？
+      key_elements:
+      - 看了3/5
+      - 剩下1-3/5=2/5
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 小明列96÷3/5，他把哪一部分对应错了？
+      error_example: 96/(3/5)
+      expected_explanation: 96是剩余2/5对应量
+    micro_transfer:
+      prompt: 如果已经看了全书的1/4，还剩150页，只列方程。
+      expected_answer: x-1/4*x=150
+      changed_core_feature: 改变已看分率
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    unit_one_object_id: total_pages
+    corresponding_object_id: read_pages
+    fraction: 3/5
+    normalized_relationship: read_pages = total_pages * 3/5
+- schema_version: '1.0'
+  case_id: g6-fraction-0002
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: fraction
+    subtype: part_to_part_with_total
+    difficulty: intermediate
+    curriculum_tags:
+    - 分数应用题
+    - 单位1
+    - 总量
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 六年级参加合唱队的女生人数是男生的4/5，男女生一共有54人。男生和女生各有多少人？
+    question: 求男生和女生人数
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: boys
+    name: 男生人数
+    type: amount
+    owner: null
+    value: null
+    unit: 人
+    role: unknown
+    source_span: 男生
+  - object_id: girls
+    name: 女生人数
+    type: amount
+    owner: null
+    value: null
+    unit: 人
+    role: unknown
+    source_span: 女生
+  - object_id: fraction
+    name: 女生占男生的分率
+    type: other
+    owner: null
+    value: 4/5
+    unit: null
+    role: given
+    source_span: 女生人数是男生的4/5
+  - object_id: total
+    name: 总人数
+    type: amount
+    owner: null
+    value: 54
+    unit: 人
+    role: given
+    source_span: 一共有54人
+  relationships:
+  - relationship_id: r1
+    type: fraction_of
+    natural_language: 女生是男生的4/5
+    expression: girls = boys * 4/5
+    operands:
+    - boys
+    - fraction
+    result: girls
+    required_conditions: []
+  - relationship_id: r2
+    type: sum
+    natural_language: 男女生总数54
+    expression: boys + girls = total
+    operands:
+    - boys
+    - girls
+    result: total
+    required_conditions: []
+  unit_one:
+    required: true
+    object_id: boys
+    evidence: “女生人数是男生的4/5”，男生是被比较的单位“1”
+  answer:
+    final_value:
+      boys: 30
+      girls: 24
+    unit: 人
+    accepted_forms:
+    - 男生30人，女生24人
+    validation_expression: 30 + 24 = 54; 24 = 30 * 4/5
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 设单位1男生为x
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 识别“谁的4/5”中的单位1
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 找单位1并设未知数
+      action: identify
+      input_objects:
+      - boys
+      - girls
+      - fraction
+      output_object: boys
+      expression_before: null
+      operation: 设男生x人
+      expression_after: boys=x
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 用分率表示女生
+      action: define
+      input_objects:
+      - boys
+      - fraction
+      output_object: girls
+      expression_before: null
+      operation: 女生为4/5x
+      expression_after: girls=4/5*x
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 根据总数列方程求男生
+      action: solve
+      input_objects:
+      - total
+      output_object: boys
+      expression_before: null
+      operation: x+4/5x=54
+      expression_after: x=30
+      result_value: 30
+      unit: 人
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 30+30*4/5==54
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 求女生并检验
+      action: check
+      input_objects:
+      - boys
+      - fraction
+      output_object: girls
+      expression_before: null
+      operation: 30×4/5=24
+      expression_after: girls=24
+      result_value: 24
+      unit: 人
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 识别男生为单位1
+      object_ids:
+      - boys
+    - node_id: n2
+      label: 女生表示为4/5x
+      object_ids:
+      - girls
+    - node_id: n3
+      label: 利用总数54
+      object_ids:
+      - total
+    - node_id: n4
+      label: 求解检验
+      object_ids:
+      - boys
+      - girls
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: unit_one
+    student_expression: boys = girls * 4/5
+    first_error_span: boys
+    misconception: 把单位1找反
+    diagnostic_question: 题目说“女生是男生的4/5”，谁被当作整体标准？
+    preferred_teaching_action: IDENTIFY_UNIT_ONE
+  - error_id: e2
+    type: operation
+    student_expression: x + 4/5 = 54
+    first_error_span: +4/5
+    misconception: 把分率当作人数直接相加
+    diagnostic_question: 4/5有“人”这个单位吗？
+    preferred_teaching_action: CLARIFY_RATE_VS_QUANTITY
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么这里男生是单位“1”？
+      key_elements:
+      - “女生是男生的4/5”
+      - 男生是被比较标准
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 如果把女生设为x，还能列方程吗？正确关系是什么？
+      error_example: boys=girls*4/5
+      expected_explanation: 若女生为x，则男生应为5/4x
+    micro_transfer:
+      prompt: 若女生是男生的2/3，总人数50，只列方程。
+      expected_answer: x+2/3*x=50（x为男生）
+      changed_core_feature: 改变分率
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    unit_one_object_id: boys
+    corresponding_object_id: girls
+    fraction: 4/5
+    normalized_relationship: girls = boys * 4/5
+- schema_version: '1.0'
+  case_id: g6-percentage-0001
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: percentage
+    subtype: discount_find_original
+    difficulty: basic
+    curriculum_tags:
+    - 百分数
+    - 折扣
+    - 方程
+    - 单位1
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 一双运动鞋打八五折后售价272元。这双鞋的原价是多少元？
+    question: 求运动鞋原价
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: original_price
+    name: 原价
+    type: price
+    owner: null
+    value: null
+    unit: 元
+    role: unknown
+    source_span: 原价
+  - object_id: sale_price
+    name: 现价
+    type: price
+    owner: null
+    value: 272
+    unit: 元
+    role: given
+    source_span: 售价272元
+  - object_id: discount_rate
+    name: 折扣率
+    type: other
+    owner: null
+    value: 85%
+    unit: null
+    role: given
+    source_span: 打八五折
+  relationships:
+  - relationship_id: r1
+    type: percentage_of
+    natural_language: 现价是原价的85%
+    expression: sale_price = original_price * 85%
+    operands:
+    - original_price
+    - discount_rate
+    result: sale_price
+    required_conditions: []
+  unit_one:
+    required: true
+    object_id: original_price
+    evidence: 折扣率表示现价占原价的百分比，原价是单位“1”
+  answer:
+    final_value: 320
+    unit: 元
+    accepted_forms:
+    - '320'
+    - 320元
+    validation_expression: 320 * 0.85 = 272
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 设原价为x的方程法
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 理解八五折=85%
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 确定单位1与折扣含义
+      action: identify
+      input_objects:
+      - original_price
+      - discount_rate
+      output_object: original_price
+      expression_before: null
+      operation: 设原价x元，八五折表示现价为85%x
+      expression_after: sale_price=0.85x
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 根据已知现价列方程
+      action: build_relation
+      input_objects:
+      - sale_price
+      output_object: null
+      expression_before: null
+      operation: 0.85x=272
+      expression_after: 0.85x=272
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 解出原价
+      action: solve
+      input_objects: []
+      output_object: original_price
+      expression_before: null
+      operation: 272÷0.85
+      expression_after: x=320
+      result_value: 320
+      unit: 元
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 320*0.85==272
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 检查折后价格
+      action: check
+      input_objects:
+      - original_price
+      - discount_rate
+      output_object: null
+      expression_before: null
+      operation: 320×85%=272
+      expression_after: 320*85%=272
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 识别原价为单位1
+      object_ids:
+      - original_price
+    - node_id: n2
+      label: 八五折转85%
+      object_ids:
+      - discount_rate
+    - node_id: n3
+      label: 现价关系列方程
+      object_ids:
+      - sale_price
+    - node_id: n4
+      label: 求解检验
+      object_ids:
+      - original_price
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: percentage_meaning
+    student_expression: 0.15x=272
+    first_error_span: '0.15'
+    misconception: 把优惠率15%当成现价率
+    diagnostic_question: 272元是付掉的钱还是优惠掉的钱？
+    preferred_teaching_action: CLARIFY_PERCENTAGE_ROLE
+  - error_id: e2
+    type: percentage_conversion
+    student_expression: 85x=272
+    first_error_span: '85'
+    misconception: 把85%当85
+    diagnostic_question: 85%写成小数是多少？
+    preferred_teaching_action: RECALL_PERCENT_CONVERSION
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么方程是0.85x=272，而不是0.15x=272？
+      key_elements:
+      - 85%是现价率
+      - 15%才是优惠率
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 小明用272÷15%求原价，错在哪里？
+      error_example: 272/15%
+      expected_explanation: 272是现价，不是优惠金额
+    micro_transfer:
+      prompt: 若七五折后售价300元，只列方程。
+      expected_answer: 0.75x=300
+      changed_core_feature: 改变折扣率
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    base_object_id: original_price
+    percentage: 85%
+    percentage_role: sale_price_rate
+    target_object_id: sale_price
+    normalized_relationship: sale_price = original_price * 85%
+- schema_version: '1.0'
+  case_id: g6-percentage-0002
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: percentage
+    subtype: increase_find_original
+    difficulty: intermediate
+    curriculum_tags:
+    - 百分数
+    - 增长率
+    - 方程
+    - 单位1
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 学校今年参加科技社团的学生有360人，比去年增加了20%。去年有多少人参加？
+    question: 求去年参加科技社团的人数
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: last_year
+    name: 去年人数
+    type: amount
+    owner: null
+    value: null
+    unit: 人
+    role: unknown
+    source_span: 去年
+  - object_id: this_year
+    name: 今年人数
+    type: amount
+    owner: null
+    value: 360
+    unit: 人
+    role: given
+    source_span: 今年有360人
+  - object_id: increase_rate
+    name: 增长率
+    type: other
+    owner: null
+    value: 20%
+    unit: null
+    role: given
+    source_span: 比去年增加了20%
+  relationships:
+  - relationship_id: r1
+    type: percentage_of
+    natural_language: 今年人数是去年人数的120%
+    expression: this_year = last_year * (1 + 20%)
+    operands:
+    - last_year
+    - increase_rate
+    result: this_year
+    required_conditions: []
+  unit_one:
+    required: true
+    object_id: last_year
+    evidence: “比去年增加20%”中的去年人数是比较基准，即单位“1”
+  answer:
+    final_value: 300
+    unit: 人
+    accepted_forms:
+    - '300'
+    - 300人
+    validation_expression: 300 * 1.2 = 360
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 设原数量为x的增长率方程
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 理解增加20%后是原来的120%
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 找单位1
+      action: identify
+      input_objects:
+      - last_year
+      - increase_rate
+      output_object: last_year
+      expression_before: null
+      operation: 设去年人数x
+      expression_after: last_year=x
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 把增长关系转成总量关系
+      action: build_relation
+      input_objects:
+      - this_year
+      - increase_rate
+      output_object: null
+      expression_before: null
+      operation: 今年=x+20%x=120%x
+      expression_after: 1.2x=360
+      result_value: null
+      unit: null
+      required_understanding: 增加20%是在原有100%基础上增加
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 解出去年人数
+      action: solve
+      input_objects: []
+      output_object: last_year
+      expression_before: null
+      operation: 360÷1.2
+      expression_after: x=300
+      result_value: 300
+      unit: 人
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 300*1.2==360
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 验证增长20%
+      action: check
+      input_objects:
+      - last_year
+      - this_year
+      output_object: null
+      expression_before: null
+      operation: 300增加20%为360
+      expression_after: 300+300*20%=360
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 识别去年为单位1
+      object_ids:
+      - last_year
+    - node_id: n2
+      label: 增加20%=120%
+      object_ids:
+      - increase_rate
+    - node_id: n3
+      label: 用今年360列方程
+      object_ids:
+      - this_year
+    - node_id: n4
+      label: 求解检验
+      object_ids:
+      - last_year
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: percentage_meaning
+    student_expression: 0.2x=360
+    first_error_span: 0.2x
+    misconception: 把今年总人数误当成增加部分
+    diagnostic_question: 360人表示增加的人数还是增加后的总人数？
+    preferred_teaching_action: CLARIFY_TARGET_AMOUNT
+  - error_id: e2
+    type: relation
+    student_expression: x=360*(1-20%)
+    first_error_span: 1-20%
+    misconception: 用今年人数直接减少20%倒推，忽略增长基准不同
+    diagnostic_question: 20%是以去年还是今年为基准？
+    preferred_teaching_action: CLARIFY_BASE
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么“比去年增加20%”对应今年是去年的120%？
+      key_elements:
+      - 去年100%
+      - 增加20%
+      - 合计120%
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 直接算360×80%=288为什么不对？
+      error_example: 360*80%
+      expected_explanation: 增长率20%以去年为基准，不能用今年直接减20%
+    micro_transfer:
+      prompt: 若今年420人，比去年增加40%，只列方程。
+      expected_answer: 1.4x=420
+      changed_core_feature: 改变增长率
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    base_object_id: last_year
+    percentage: 20%
+    percentage_role: increase_rate
+    target_object_id: this_year
+    normalized_relationship: this_year = last_year * (1 + 20%)
+- schema_version: '1.0'
+  case_id: g6-motion-0001
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: motion
+    subtype: opposite_meet
+    difficulty: basic
+    curriculum_tags:
+    - 行程问题
+    - 相遇
+    - 方程
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 甲、乙两人同时从相距360米的两地相向而行。甲每分钟走50米，乙每分钟走70米。几分钟后两人相遇？
+    question: 求相遇时间
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: traveler_a
+    name: 甲
+    type: person
+    owner: null
+    value: null
+    unit: null
+    role: given
+    source_span: 甲
+  - object_id: traveler_b
+    name: 乙
+    type: person
+    owner: null
+    value: null
+    unit: null
+    role: given
+    source_span: 乙
+  - object_id: speed_a
+    name: 甲速度
+    type: speed
+    owner: null
+    value: 50
+    unit: 米/分钟
+    role: given
+    source_span: 每分钟走50米
+  - object_id: speed_b
+    name: 乙速度
+    type: speed
+    owner: null
+    value: 70
+    unit: 米/分钟
+    role: given
+    source_span: 每分钟走70米
+  - object_id: time
+    name: 相遇时间
+    type: time
+    owner: null
+    value: null
+    unit: 分钟
+    role: unknown
+    source_span: 几分钟后
+  - object_id: distance_total
+    name: 两地距离
+    type: distance
+    owner: null
+    value: 360
+    unit: 米
+    role: given
+    source_span: 相距360米
+  - object_id: distance_a
+    name: 甲路程
+    type: distance
+    owner: null
+    value: null
+    unit: 米
+    role: intermediate
+    source_span: 甲走的路程
+  - object_id: distance_b
+    name: 乙路程
+    type: distance
+    owner: null
+    value: null
+    unit: 米
+    role: intermediate
+    source_span: 乙走的路程
+  relationships:
+  - relationship_id: r1
+    type: distance_formula
+    natural_language: 甲路程=甲速度×时间
+    expression: distance_a = speed_a * time
+    operands:
+    - speed_a
+    - time
+    result: distance_a
+    required_conditions: []
+  - relationship_id: r2
+    type: distance_formula
+    natural_language: 乙路程=乙速度×时间
+    expression: distance_b = speed_b * time
+    operands:
+    - speed_b
+    - time
+    result: distance_b
+    required_conditions: []
+  - relationship_id: r3
+    type: sum
+    natural_language: 相向相遇时两人路程和等于总距离
+    expression: distance_a + distance_b = distance_total
+    operands:
+    - distance_a
+    - distance_b
+    result: distance_total
+    required_conditions: []
+  unit_one:
+    required: false
+    object_id: null
+    evidence: null
+  answer:
+    final_value: 3
+    unit: 分钟
+    accepted_forms:
+    - '3'
+    - 3分钟
+    validation_expression: 50 * 3 + 70 * 3 = 360
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 设共同运动时间为x
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 理解同时出发且相向相遇
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 确定共同时间
+      action: define
+      input_objects:
+      - time
+      output_object: time
+      expression_before: null
+      operation: 设x分钟后相遇
+      expression_after: time=x
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 分别表示两人路程
+      action: build_relation
+      input_objects:
+      - speed_a
+      - speed_b
+      - time
+      output_object: null
+      expression_before: null
+      operation: 甲50x米，乙70x米
+      expression_after: distance_a=50x; distance_b=70x
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 利用相遇条件列方程
+      action: solve
+      input_objects:
+      - distance_total
+      output_object: time
+      expression_before: null
+      operation: 50x+70x=360
+      expression_after: x=3
+      result_value: 3
+      unit: 分钟
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 50*3+70*3==360
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 检验路程和
+      action: check
+      input_objects:
+      - distance_a
+      - distance_b
+      output_object: null
+      expression_before: null
+      operation: 150+210=360
+      expression_after: 150+210=360
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 设相遇时间x
+      object_ids:
+      - time
+    - node_id: n2
+      label: 表示甲乙路程
+      object_ids:
+      - distance_a
+      - distance_b
+    - node_id: n3
+      label: 相向相遇路程和=360
+      object_ids:
+      - distance_total
+    - node_id: n4
+      label: 求解检验
+      object_ids:
+      - time
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: relation
+    student_expression: (70-50)x=360
+    first_error_span: 70-50
+    misconception: 相向相遇错用速度差
+    diagnostic_question: 两个人是朝同一个方向还是彼此靠近？
+    preferred_teaching_action: SELECT_SPEED_SUM
+  - error_id: e2
+    type: object_binding
+    student_expression: 50x=360
+    first_error_span: 50x
+    misconception: 只计算甲的路程，忽略乙也在运动
+    diagnostic_question: 相遇前乙有没有走路？
+    preferred_teaching_action: INCLUDE_BOTH_TRAVELERS
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么相向相遇要把两人的路程相加？
+      key_elements:
+      - 两人共同缩短间距
+      - 相遇时两段路程合成总距离
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 用速度差70-50列方程适合这种相向题吗？为什么？
+      error_example: (70-50)x=360
+      expected_explanation: 速度差适合追及，不适合相向相遇
+    micro_transfer:
+      prompt: 若两地480米，速度仍50和70，只列方程。
+      expected_answer: 50x+70x=480
+      changed_core_feature: 改变总距离
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    motion_mode: opposite
+    event: meet
+    travelers:
+    - object_id: traveler_a
+      speed_object_id: speed_a
+      time_object_id: time
+      distance_object_id: distance_a
+    - object_id: traveler_b
+      speed_object_id: speed_b
+      time_object_id: time
+      distance_object_id: distance_b
+    event_relationship: distance_a + distance_b = distance_total
+- schema_version: '1.0'
+  case_id: g6-motion-0002
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: motion
+    subtype: same_direction_catch_up_delayed
+    difficulty: intermediate
+    curriculum_tags:
+    - 行程问题
+    - 追及
+    - 先后出发
+    - 方程
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 小明先从学校出发步行，每分钟走60米。30分钟后，小华从同一地点骑车沿同一方向追赶，每分钟行90米。小华出发多少分钟后追上小明？
+    question: 求小华出发后的追及时间
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: ming
+    name: 小明
+    type: person
+    owner: null
+    value: null
+    unit: null
+    role: given
+    source_span: 小明
+  - object_id: hua
+    name: 小华
+    type: person
+    owner: null
+    value: null
+    unit: null
+    role: given
+    source_span: 小华
+  - object_id: speed_ming
+    name: 小明速度
+    type: speed
+    owner: null
+    value: 60
+    unit: 米/分钟
+    role: given
+    source_span: 每分钟走60米
+  - object_id: speed_hua
+    name: 小华速度
+    type: speed
+    owner: null
+    value: 90
+    unit: 米/分钟
+    role: given
+    source_span: 每分钟行90米
+  - object_id: head_start
+    name: 提前时间
+    type: time
+    owner: null
+    value: 30
+    unit: 分钟
+    role: given
+    source_span: 30分钟后
+  - object_id: catch_time
+    name: 小华追赶时间
+    type: time
+    owner: null
+    value: null
+    unit: 分钟
+    role: unknown
+    source_span: 小华出发多少分钟后
+  - object_id: distance_ming
+    name: 小明总路程
+    type: distance
+    owner: null
+    value: null
+    unit: 米
+    role: intermediate
+    source_span: 小明路程
+  - object_id: distance_hua
+    name: 小华路程
+    type: distance
+    owner: null
+    value: null
+    unit: 米
+    role: intermediate
+    source_span: 小华路程
+  relationships:
+  - relationship_id: r1
+    type: distance_formula
+    natural_language: 小华路程=90×追赶时间
+    expression: distance_hua = speed_hua * catch_time
+    operands:
+    - speed_hua
+    - catch_time
+    result: distance_hua
+    required_conditions: []
+  - relationship_id: r2
+    type: distance_formula
+    natural_language: 小明总时间比小华多30分钟
+    expression: distance_ming = speed_ming * (catch_time + head_start)
+    operands:
+    - speed_ming
+    - catch_time
+    - head_start
+    result: distance_ming
+    required_conditions: []
+  - relationship_id: r3
+    type: difference
+    natural_language: 追上时两人从同一点出发的路程相等
+    expression: distance_hua = distance_ming
+    operands:
+    - distance_hua
+    - distance_ming
+    result: distance_hua
+    required_conditions: []
+  unit_one:
+    required: false
+    object_id: null
+    evidence: null
+  answer:
+    final_value: 60
+    unit: 分钟
+    accepted_forms:
+    - '60'
+    - 60分钟
+    validation_expression: 90 * 60 = 60 * (60 + 30)
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 分别表示两人的运动时间
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 识别小明多走30分钟
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 设追赶时间
+      action: define
+      input_objects:
+      - catch_time
+      output_object: catch_time
+      expression_before: null
+      operation: 设小华出发x分钟后追上
+      expression_after: catch_time=x
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 表示两人的路程
+      action: build_relation
+      input_objects:
+      - speed_hua
+      - speed_ming
+      - head_start
+      output_object: null
+      expression_before: null
+      operation: 小华90x；小明60(x+30)
+      expression_after: distance_hua=90x; distance_ming=60(x+30)
+      result_value: null
+      unit: null
+      required_understanding: 小明的总运动时间是x+30
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 利用追上时路程相等列方程
+      action: solve
+      input_objects: []
+      output_object: catch_time
+      expression_before: null
+      operation: 90x=60(x+30)
+      expression_after: x=60
+      result_value: 60
+      unit: 分钟
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 90*60==60*(60+30)
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 检查两人路程
+      action: check
+      input_objects:
+      - distance_hua
+      - distance_ming
+      output_object: null
+      expression_before: null
+      operation: 均为5400米
+      expression_after: 90*60=60*90=5400
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 设小华追赶x分钟
+      object_ids:
+      - catch_time
+    - node_id: n2
+      label: 小明时间x+30
+      object_ids:
+      - head_start
+    - node_id: n3
+      label: 追上时路程相等
+      object_ids:
+      - distance_ming
+      - distance_hua
+    - node_id: n4
+      label: 求解检验
+      object_ids:
+      - catch_time
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: time_shift
+    student_expression: 90x=60x
+    first_error_span: 60x
+    misconception: 忽略小明提前30分钟
+    diagnostic_question: 追上时小明一共走了x分钟还是x+30分钟？
+    preferred_teaching_action: ACCOUNT_FOR_HEAD_START
+  - error_id: e2
+    type: relation
+    student_expression: (90+60)x=60*30
+    first_error_span: 90+60
+    misconception: 追及问题错用速度和
+    diagnostic_question: 两人同向时，缩短差距靠速度和还是速度差？
+    preferred_teaching_action: SELECT_SPEED_DIFFERENCE
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么小明的路程要写成60(x+30)？
+      key_elements:
+      - 小明提前30分钟
+      - 追赶期间小明仍继续走
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 如果写90x=60x，会漏掉什么？
+      error_example: 90x=60x
+      expected_explanation: 漏掉小明提前30分钟形成的领先路程
+    micro_transfer:
+      prompt: 若小明提前20分钟，其他不变，只列方程。
+      expected_answer: 90x=60(x+20)
+      changed_core_feature: 改变提前时间
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    motion_mode: same_direction
+    event: catch_up
+    travelers:
+    - object_id: ming
+      speed_object_id: speed_ming
+      time_object_id: catch_time_plus_head_start
+      distance_object_id: distance_ming
+    - object_id: hua
+      speed_object_id: speed_hua
+      time_object_id: catch_time
+      distance_object_id: distance_hua
+    event_relationship: distance_hua = distance_ming
+    time_offset_minutes: 30
+- schema_version: '1.0'
+  case_id: g6-work-rate-0001
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: work_rate
+    subtype: two_workers_together
+    difficulty: basic
+    curriculum_tags:
+    - 工程问题
+    - 合作效率
+    - 单位1
+    - 方程
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 一项工程，甲单独做6天完成，乙单独做3天完成。两人合作多少天可以完成？
+    question: 求两人合作完成的时间
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: total_work
+    name: 总工作量
+    type: work
+    owner: null
+    value: 1
+    unit: null
+    role: given
+    source_span: 一项工程
+  - object_id: worker_a
+    name: 甲
+    type: person
+    owner: null
+    value: null
+    unit: null
+    role: given
+    source_span: 甲
+  - object_id: worker_b
+    name: 乙
+    type: person
+    owner: null
+    value: null
+    unit: null
+    role: given
+    source_span: 乙
+  - object_id: time_a
+    name: 甲单独时间
+    type: time
+    owner: null
+    value: 6
+    unit: 天
+    role: given
+    source_span: 6天完成
+  - object_id: time_b
+    name: 乙单独时间
+    type: time
+    owner: null
+    value: 3
+    unit: 天
+    role: given
+    source_span: 3天完成
+  - object_id: eff_a
+    name: 甲效率
+    type: other
+    owner: null
+    value: 1/6
+    unit: 工程/天
+    role: intermediate
+    source_span: 由6天完成得到
+  - object_id: eff_b
+    name: 乙效率
+    type: other
+    owner: null
+    value: 1/3
+    unit: 工程/天
+    role: intermediate
+    source_span: 由3天完成得到
+  - object_id: together_time
+    name: 合作时间
+    type: time
+    owner: null
+    value: null
+    unit: 天
+    role: unknown
+    source_span: 合作多少天
+  relationships:
+  - relationship_id: r1
+    type: work_formula
+    natural_language: 甲效率=1÷6
+    expression: eff_a = total_work / time_a
+    operands:
+    - total_work
+    - time_a
+    result: eff_a
+    required_conditions: []
+  - relationship_id: r2
+    type: work_formula
+    natural_language: 乙效率=1÷3
+    expression: eff_b = total_work / time_b
+    operands:
+    - total_work
+    - time_b
+    result: eff_b
+    required_conditions: []
+  - relationship_id: r3
+    type: work_formula
+    natural_language: 合作效率乘时间等于总工作量
+    expression: (eff_a + eff_b) * together_time = total_work
+    operands:
+    - eff_a
+    - eff_b
+    - together_time
+    result: total_work
+    required_conditions: []
+  unit_one:
+    required: true
+    object_id: total_work
+    evidence: 未给具体工作量，可把整项工程设为单位“1”
+  answer:
+    final_value: 2
+    unit: 天
+    accepted_forms:
+    - '2'
+    - 2天
+    validation_expression: (1/6 + 1/3) * 2 = 1
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 总工作量设为1的方程法
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 理解工作效率=工作量÷时间
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 把总工作量设为1并求效率
+      action: identify
+      input_objects:
+      - total_work
+      - time_a
+      - time_b
+      output_object: null
+      expression_before: null
+      operation: 甲效率1/6，乙效率1/3
+      expression_after: eff_a=1/6; eff_b=1/3
+      result_value: null
+      unit: null
+      required_understanding: 单独n天完成表示每天完成1/n
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 设合作时间
+      action: define
+      input_objects:
+      - together_time
+      output_object: together_time
+      expression_before: null
+      operation: 设合作x天
+      expression_after: together_time=x
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 列工作量方程并求解
+      action: solve
+      input_objects:
+      - eff_a
+      - eff_b
+      - total_work
+      output_object: together_time
+      expression_before: null
+      operation: (1/6+1/3)x=1
+      expression_after: x=2
+      result_value: 2
+      unit: 天
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: (1/6+1/3)*2==1
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 检查完成量
+      action: check
+      input_objects: []
+      output_object: null
+      expression_before: null
+      operation: 2天甲完成1/3，乙完成2/3，合计1
+      expression_after: 1/3+2/3=1
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 总工作量设1
+      object_ids:
+      - total_work
+    - node_id: n2
+      label: 求甲乙效率
+      object_ids:
+      - eff_a
+      - eff_b
+    - node_id: n3
+      label: 合作效率相加
+      object_ids:
+      - eff_a
+      - eff_b
+    - node_id: n4
+      label: 列方程求时间
+      object_ids:
+      - together_time
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: operation
+    student_expression: 6+3=9天
+    first_error_span: 6+3
+    misconception: 把各自完成时间直接相加
+    diagnostic_question: 合作时应该合并“时间”还是每天完成的“效率”？
+    preferred_teaching_action: FOCUS_ON_EFFICIENCY
+  - error_id: e2
+    type: relation
+    student_expression: (1/3-1/6)x=1
+    first_error_span: 1/3-1/6
+    misconception: 合作时错误使用效率差
+    diagnostic_question: 两个人同时做，完成速度会相加还是相减？
+    preferred_teaching_action: USE_COMBINED_EFFICIENCY
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么甲每天的效率可以写成1/6？
+      key_elements:
+      - 整项工程设为1
+      - 6天均匀完成
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 合作效率为什么是1/6+1/3而不是相减？
+      error_example: 1/3-1/6
+      expected_explanation: 两人都在推进同一工程，完成量累加
+    micro_transfer:
+      prompt: 若甲8天、乙8天完成，只列方程。
+      expected_answer: (1/8+1/8)x=1
+      changed_core_feature: 改变独立时间
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    total_work_object_id: total_work
+    total_work_normalized_value: 1
+    workers:
+    - object_id: worker_a
+      solo_time: 6
+      efficiency_expression: 1/6
+    - object_id: worker_b
+      solo_time: 3
+      efficiency_expression: 1/3
+    combined_efficiency_expression: 1/6 + 1/3
+- schema_version: '1.0'
+  case_id: g6-work-rate-0002
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: work_rate
+    subtype: together_then_single
+    difficulty: intermediate
+    curriculum_tags:
+    - 工程问题
+    - 分阶段
+    - 合作效率
+    - 方程
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 一项工程，甲单独做8天完成，乙单独做12天完成。两人先合作3天，剩下的由甲单独完成。甲还需要多少天？
+    question: 求合作3天后甲单独完成剩余工程所需时间
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: total_work
+    name: 总工作量
+    type: work
+    owner: null
+    value: 1
+    unit: null
+    role: given
+    source_span: 一项工程
+  - object_id: time_a
+    name: 甲单独完成时间
+    type: time
+    owner: null
+    value: 8
+    unit: 天
+    role: given
+    source_span: 8天完成
+  - object_id: time_b
+    name: 乙单独完成时间
+    type: time
+    owner: null
+    value: 12
+    unit: 天
+    role: given
+    source_span: 12天完成
+  - object_id: together_days
+    name: 合作天数
+    type: time
+    owner: null
+    value: 3
+    unit: 天
+    role: given
+    source_span: 先合作3天
+  - object_id: eff_a
+    name: 甲效率
+    type: other
+    owner: null
+    value: 1/8
+    unit: 工程/天
+    role: intermediate
+    source_span: 甲单独8天
+  - object_id: eff_b
+    name: 乙效率
+    type: other
+    owner: null
+    value: 1/12
+    unit: 工程/天
+    role: intermediate
+    source_span: 乙单独12天
+  - object_id: remaining_a_days
+    name: 甲剩余单做时间
+    type: time
+    owner: null
+    value: null
+    unit: 天
+    role: unknown
+    source_span: 甲还需要多少天
+  relationships:
+  - relationship_id: r1
+    type: work_formula
+    natural_language: 合作3天完成量=3×(1/8+1/12)
+    expression: together_done = 3 * (1/8 + 1/12)
+    operands:
+    - eff_a
+    - eff_b
+    - together_days
+    result: together_done
+    required_conditions: []
+  - relationship_id: r2
+    type: work_formula
+    natural_language: 合作完成量+甲后续完成量=总工作量
+    expression: 3*(1/8+1/12) + (1/8)*remaining_a_days = 1
+    operands:
+    - remaining_a_days
+    result: total_work
+    required_conditions: []
+  unit_one:
+    required: true
+    object_id: total_work
+    evidence: 整项工程可设为1
+  answer:
+    final_value: 3
+    unit: 天
+    accepted_forms:
+    - '3'
+    - 3天
+    validation_expression: 3*(1/8+1/12) + 3*(1/8) = 1
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 分阶段工作量方程
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 能区分合作阶段和单独阶段
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 求甲乙效率
+      action: identify
+      input_objects:
+      - time_a
+      - time_b
+      output_object: null
+      expression_before: null
+      operation: 甲1/8，乙1/12
+      expression_after: eff_a=1/8; eff_b=1/12
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 表示合作3天完成量
+      action: multiply
+      input_objects:
+      - eff_a
+      - eff_b
+      - together_days
+      output_object: null
+      expression_before: null
+      operation: 3×(1/8+1/12)=5/8
+      expression_after: together_done=5/8
+      result_value: 5/8
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 设甲后续时间并列总工作量方程
+      action: build_relation
+      input_objects:
+      - remaining_a_days
+      - eff_a
+      - total_work
+      output_object: null
+      expression_before: null
+      operation: 设x天，5/8+x/8=1
+      expression_after: 5/8+x/8=1
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 解方程并检验
+      action: solve
+      input_objects: []
+      output_object: remaining_a_days
+      expression_before: null
+      operation: x/8=3/8
+      expression_after: x=3
+      result_value: 3
+      unit: 天
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 3*(1/8+1/12)+3/8==1
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 求两人效率
+      object_ids:
+      - eff_a
+      - eff_b
+    - node_id: n2
+      label: 算合作3天完成量
+      object_ids:
+      - together_days
+    - node_id: n3
+      label: 表示甲后续完成量
+      object_ids:
+      - remaining_a_days
+    - node_id: n4
+      label: 总工作量=1列方程
+      object_ids:
+      - total_work
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: unit
+    student_expression: 3*(1/8+1/12)=5/8，所以还要3/8天
+    first_error_span: 3/8天
+    misconception: 把剩余工作量3/8直接当成时间
+    diagnostic_question: 3/8表示“工程量”还是“天数”？
+    preferred_teaching_action: DISTINGUISH_WORK_AND_TIME
+  - error_id: e2
+    type: object_binding
+    student_expression: 5/8 + x/12 = 1
+    first_error_span: x/12
+    misconception: 剩余由甲完成却使用乙效率
+    diagnostic_question: 最后是谁单独完成？甲每天完成几分之一？
+    preferred_teaching_action: BIND_WORKER_EFFICIENCY
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么合作3天后剩下3/8工程，但甲还要3天而不是3/8天？
+      key_elements:
+      - 3/8是工作量
+      - 甲效率1/8/天
+      - 时间=工作量÷效率
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 若最后写成x/12，错在哪里？
+      error_example: 5/8+x/12=1
+      expected_explanation: 最后阶段由甲做，应使用甲效率1/8
+    micro_transfer:
+      prompt: 若合作2天后由甲完成，只列方程。
+      expected_answer: 2*(1/8+1/12)+x/8=1
+      changed_core_feature: 改变合作阶段时间
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    total_work_object_id: total_work
+    total_work_normalized_value: 1
+    workers:
+    - object_id: worker_a
+      solo_time: 8
+      efficiency_expression: 1/8
+    - object_id: worker_b
+      solo_time: 12
+      efficiency_expression: 1/12
+    combined_efficiency_expression: 1/8 + 1/12
+    stages:
+    - 合作3天
+    - 甲单独完成剩余
+- schema_version: '1.0'
+  case_id: g6-age-0001
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: age
+    subtype: future_multiple
+    difficulty: basic
+    curriculum_tags:
+    - 年龄问题
+    - 未来年龄
+    - 方程
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 爸爸今年36岁，儿子今年12岁。多少年后爸爸的年龄是儿子的2倍？
+    question: 求多少年后年龄成2倍关系
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: father_now
+    name: 爸爸当前年龄
+    type: age
+    owner: null
+    value: 36
+    unit: 岁
+    role: given
+    source_span: 爸爸今年36岁
+  - object_id: son_now
+    name: 儿子当前年龄
+    type: age
+    owner: null
+    value: 12
+    unit: 岁
+    role: given
+    source_span: 儿子今年12岁
+  - object_id: years
+    name: 经过年数
+    type: time
+    owner: null
+    value: null
+    unit: 年
+    role: unknown
+    source_span: 多少年后
+  - object_id: father_future
+    name: 爸爸未来年龄
+    type: age
+    owner: null
+    value: null
+    unit: 岁
+    role: intermediate
+    source_span: 爸爸的年龄
+  - object_id: son_future
+    name: 儿子未来年龄
+    type: age
+    owner: null
+    value: null
+    unit: 岁
+    role: intermediate
+    source_span: 儿子的年龄
+  relationships:
+  - relationship_id: r1
+    type: age_shift
+    natural_language: 爸爸未来年龄=36+年数
+    expression: father_future = father_now + years
+    operands:
+    - father_now
+    - years
+    result: father_future
+    required_conditions: []
+  - relationship_id: r2
+    type: age_shift
+    natural_language: 儿子未来年龄=12+年数
+    expression: son_future = son_now + years
+    operands:
+    - son_now
+    - years
+    result: son_future
+    required_conditions: []
+  - relationship_id: r3
+    type: multiple
+    natural_language: 目标时间点爸爸年龄=2×儿子年龄
+    expression: father_future = 2 * son_future
+    operands:
+    - father_future
+    - son_future
+    result: father_future
+    required_conditions: []
+  unit_one:
+    required: false
+    object_id: null
+    evidence: null
+  answer:
+    final_value: 12
+    unit: 年
+    accepted_forms:
+    - '12'
+    - 12年
+    validation_expression: 36 + 12 = 2 * (12 + 12)
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 设未来经过x年
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 理解两人的年龄同时增加同样年数
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 设时间偏移
+      action: define
+      input_objects:
+      - years
+      output_object: years
+      expression_before: null
+      operation: 设x年后
+      expression_after: years=x
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 表示两人未来年龄
+      action: build_relation
+      input_objects:
+      - father_now
+      - son_now
+      - years
+      output_object: null
+      expression_before: null
+      operation: 爸爸36+x，儿子12+x
+      expression_after: father_future=36+x; son_future=12+x
+      result_value: null
+      unit: null
+      required_understanding: 经过x年，两人都增加x岁
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 根据倍数关系列方程并求解
+      action: solve
+      input_objects: []
+      output_object: years
+      expression_before: null
+      operation: 36+x=2(12+x)
+      expression_after: x=12
+      result_value: 12
+      unit: 年
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 36+12==2*(12+12)
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 检验未来年龄
+      action: check
+      input_objects: []
+      output_object: null
+      expression_before: null
+      operation: 48岁与24岁，正好2倍
+      expression_after: 48=2*24
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 设x年后
+      object_ids:
+      - years
+    - node_id: n2
+      label: 两人都+x
+      object_ids:
+      - father_future
+      - son_future
+    - node_id: n3
+      label: 建立2倍关系
+      object_ids:
+      - father_future
+      - son_future
+    - node_id: n4
+      label: 求解检验
+      object_ids:
+      - years
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: time_shift
+    student_expression: 36+x=2*12
+    first_error_span: 2*12
+    misconception: 只给爸爸年龄加x，没有给儿子加x
+    diagnostic_question: x年后儿子的年龄会不会也变化？
+    preferred_teaching_action: SHIFT_BOTH_AGES
+  - error_id: e2
+    type: relation
+    student_expression: 36-12=24，所以12年后
+    first_error_span: '24'
+    misconception: 只看年龄差，未建立目标倍数关系
+    diagnostic_question: 年龄差不变能直接告诉你何时变成2倍吗？
+    preferred_teaching_action: BUILD_TIMED_RATIO
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么方程两边的年龄都要加x？
+      key_elements:
+      - 同样经过x年
+      - 两个人年龄同时增长
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 36+x=2×12漏掉了什么？
+      error_example: 36+x=2*12
+      expected_explanation: 漏掉儿子x年后的年龄变化
+    micro_transfer:
+      prompt: 若爸爸40岁、儿子15岁，多少年后爸爸2倍，只列方程。
+      expected_answer: 40+x=2(15+x)
+      changed_core_feature: 改变当前年龄
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    people:
+    - object_id: father
+      current_age_object_id: father_now
+    - object_id: son
+      current_age_object_id: son_now
+    time_offset:
+      value: null
+      direction: future
+    invariant_relationship: father_age - son_age = 24
+    timed_relationship: father_now + x = 2 * (son_now + x)
+- schema_version: '1.0'
+  case_id: g6-age-0002
+  status: draft
+  scope:
+    subject: 数学
+    grade: 六年级
+    domain: 应用题
+    problem_type: age
+    subtype: past_multiple
+    difficulty: intermediate
+    curriculum_tags:
+    - 年龄问题
+    - 过去年龄
+    - 方程
+    - 时间方向
+  source:
+    origin: original
+    source_reference: null
+    copyright_status: cleared
+  problem:
+    text: 妈妈今年42岁，女儿今年12岁。多少年前妈妈的年龄是女儿的4倍？
+    question: 求多少年前妈妈年龄是女儿4倍
+    answer_form: quantity_with_unit
+    has_irrelevant_information: false
+    has_implicit_condition: false
+    implicit_conditions: []
+  objects:
+  - object_id: mother_now
+    name: 妈妈当前年龄
+    type: age
+    owner: null
+    value: 42
+    unit: 岁
+    role: given
+    source_span: 妈妈今年42岁
+  - object_id: daughter_now
+    name: 女儿当前年龄
+    type: age
+    owner: null
+    value: 12
+    unit: 岁
+    role: given
+    source_span: 女儿今年12岁
+  - object_id: years_ago
+    name: 向过去的年数
+    type: time
+    owner: null
+    value: null
+    unit: 年
+    role: unknown
+    source_span: 多少年前
+  - object_id: mother_past
+    name: 妈妈过去年龄
+    type: age
+    owner: null
+    value: null
+    unit: 岁
+    role: intermediate
+    source_span: 妈妈的年龄
+  - object_id: daughter_past
+    name: 女儿过去年龄
+    type: age
+    owner: null
+    value: null
+    unit: 岁
+    role: intermediate
+    source_span: 女儿的年龄
+  relationships:
+  - relationship_id: r1
+    type: age_shift
+    natural_language: 妈妈过去年龄=42-x
+    expression: mother_past = mother_now - years_ago
+    operands:
+    - mother_now
+    - years_ago
+    result: mother_past
+    required_conditions: []
+  - relationship_id: r2
+    type: age_shift
+    natural_language: 女儿过去年龄=12-x
+    expression: daughter_past = daughter_now - years_ago
+    operands:
+    - daughter_now
+    - years_ago
+    result: daughter_past
+    required_conditions: []
+  - relationship_id: r3
+    type: multiple
+    natural_language: 过去某时妈妈年龄=4×女儿年龄
+    expression: mother_past = 4 * daughter_past
+    operands:
+    - mother_past
+    - daughter_past
+    result: mother_past
+    required_conditions: []
+  unit_one:
+    required: false
+    object_id: null
+    evidence: null
+  answer:
+    final_value: 2
+    unit: 年
+    accepted_forms:
+    - '2'
+    - 2年前
+    validation_expression: 42 - 2 = 4 * (12 - 2)
+    internal_only: true
+  solution_paths:
+  - path_id: path_1
+    method: 设x年前并同步减去x
+    age_appropriate: true
+    priority: 1
+    prerequisites:
+    - 正确识别“年前”对应减法
+    steps:
+    - step_id: p1_s1
+      depends_on: []
+      goal: 设过去时间
+      action: define
+      input_objects:
+      - years_ago
+      output_object: years_ago
+      expression_before: null
+      operation: 设x年前
+      expression_after: years_ago=x
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s2
+      depends_on:
+      - p1_s1
+      goal: 表示两人过去年龄
+      action: build_relation
+      input_objects:
+      - mother_now
+      - daughter_now
+      output_object: null
+      expression_before: null
+      operation: 妈妈42-x，女儿12-x
+      expression_after: mother_past=42-x; daughter_past=12-x
+      result_value: null
+      unit: null
+      required_understanding: 回到x年前，两个人都减少x岁
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+    - step_id: p1_s3
+      depends_on:
+      - p1_s2
+      goal: 建立4倍方程并求解
+      action: solve
+      input_objects: []
+      output_object: years_ago
+      expression_before: null
+      operation: 42-x=4(12-x)
+      expression_after: x=2
+      result_value: 2
+      unit: 年
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+      verification:
+        tool: rule
+        assertion: 42-2==4*(12-2)
+    - step_id: p1_s4
+      depends_on:
+      - p1_s3
+      goal: 检验过去年龄
+      action: check
+      input_objects: []
+      output_object: null
+      expression_before: null
+      operation: 40岁与10岁，正好4倍
+      expression_after: 40=4*10
+      result_value: null
+      unit: null
+      required_understanding: null
+      allowed_hint_levels:
+        L1: 提醒相关概念，不给具体算式
+        L2: 聚焦题目中的关键条件
+        L3: 提示应建立的关系方向
+        L4: 拆出当前一个小步骤
+      forbidden_before_student_attempt:
+      - 直接给出本步之后的完整答案
+  solution_graph:
+    nodes:
+    - node_id: n1
+      label: 设x年前
+      object_ids:
+      - years_ago
+    - node_id: n2
+      label: 两人年龄都-x
+      object_ids:
+      - mother_past
+      - daughter_past
+    - node_id: n3
+      label: 建立过去4倍关系
+      object_ids:
+      - mother_past
+      - daughter_past
+    - node_id: n4
+      label: 求解检验
+      object_ids:
+      - years_ago
+    edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4
+    branch_rules: []
+  common_errors:
+  - error_id: e1
+    type: time_shift
+    student_expression: 42+x=4(12+x)
+    first_error_span: +x
+    misconception: 把“年前”写成未来年龄
+    diagnostic_question: “年前”应该比现在年龄大还是小？
+    preferred_teaching_action: CLARIFY_TIME_DIRECTION
+  - error_id: e2
+    type: time_shift
+    student_expression: 42-x=4*12
+    first_error_span: 4*12
+    misconception: 只改变妈妈年龄，女儿年龄未同步变化
+    diagnostic_question: x年前女儿是不是也年轻x岁？
+    preferred_teaching_action: SHIFT_BOTH_AGES
+  teaching_boundaries:
+    before_student_final_attempt:
+      allowed:
+      - 询问未知量应设为什么
+      - 询问题目中的核心等量关系
+      - 只提示当前一步，不直接给出最终答案
+      forbidden:
+      - 直接输出最终答案
+      - 一次展示完整方程、求解过程和答案
+    after_student_final_attempt:
+      allowed:
+      - 判断答案是否正确
+      - 要求学生解释等量关系
+      - 引导代回检验
+      forbidden: []
+  understanding_checks:
+    explain_why:
+      prompt: 为什么“x年前”两个人的年龄都要减x？
+      key_elements:
+      - 时间同时倒退
+      - 年龄差保持不变
+      common_weak_answers:
+      - 只说“因为老师这样教”
+      - 只报结果，不解释数量关系
+    error_detection:
+      prompt: 方程42+x=4(12+x)描述的是过去还是未来？
+      error_example: 42+x=4(12+x)
+      expected_explanation: 这是x年后的关系，不是x年前
+    micro_transfer:
+      prompt: 若妈妈45岁、女儿15岁，问几年前妈妈4倍，只列方程。
+      expected_answer: 45-x=4(15-x)
+      changed_core_feature: 改变当前年龄
+  review:
+    math_reviewer: null
+    pedagogy_reviewer: null
+    reviewed_at: null
+    tool_verification_passed: true
+    notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+  type_specific:
+    people:
+    - object_id: mother
+      current_age_object_id: mother_now
+    - object_id: daughter
+      current_age_object_id: daughter_now
+    time_offset:
+      value: null
+      direction: past
+    invariant_relationship: mother_age - daughter_age = 30
+    timed_relationship: mother_now - x = 4 * (daughter_now - x)

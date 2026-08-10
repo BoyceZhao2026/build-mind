@@ -1,0 +1,280 @@
+schema_version: '1.0'
+case_id: g6-sum-difference-0002
+status: draft
+scope:
+  subject: 数学
+  grade: 六年级
+  domain: 应用题
+  problem_type: sum_difference
+  subtype: total_and_difference
+  difficulty: intermediate
+  curriculum_tags:
+  - 和差问题
+  - 方程
+  - 对象绑定
+source:
+  origin: original
+  source_reference: null
+  copyright_status: cleared
+problem:
+  text: 六年级一班和二班共植树126棵，一班比二班多24棵。两个班各植树多少棵？
+  question: 求一班和二班各植树多少棵
+  answer_form: quantity_with_unit
+  has_irrelevant_information: false
+  has_implicit_condition: false
+  implicit_conditions: []
+objects:
+- object_id: class2
+  name: 二班植树数
+  type: amount
+  owner: null
+  value: null
+  unit: 棵
+  role: unknown
+  source_span: 二班
+- object_id: class1
+  name: 一班植树数
+  type: amount
+  owner: null
+  value: null
+  unit: 棵
+  role: unknown
+  source_span: 一班
+- object_id: total
+  name: 总植树数
+  type: amount
+  owner: null
+  value: 126
+  unit: 棵
+  role: given
+  source_span: 共植树126棵
+- object_id: diff
+  name: 相差数
+  type: amount
+  owner: null
+  value: 24
+  unit: 棵
+  role: given
+  source_span: 多24棵
+relationships:
+- relationship_id: r1
+  type: sum
+  natural_language: 两班植树总数为126
+  expression: class1 + class2 = total
+  operands:
+  - class1
+  - class2
+  result: total
+  required_conditions: []
+- relationship_id: r2
+  type: difference
+  natural_language: 一班比二班多24棵
+  expression: class1 - class2 = diff
+  operands:
+  - class1
+  - class2
+  result: diff
+  required_conditions: []
+unit_one:
+  required: false
+  object_id: null
+  evidence: null
+answer:
+  final_value:
+    class1: 75
+    class2: 51
+  unit: 棵
+  accepted_forms:
+  - 一班75棵，二班51棵
+  - 75棵和51棵
+  validation_expression: 75 + 51 = 126; 75 - 51 = 24
+  internal_only: true
+solution_paths:
+- path_id: path_1
+  method: 设二班为 x 的方程法
+  age_appropriate: true
+  priority: 1
+  prerequisites:
+  - 识别一班是较大量
+  steps:
+  - step_id: p1_s1
+    depends_on: []
+    goal: 设二班数量并表示一班
+    action: define
+    input_objects:
+    - class2
+    - diff
+    output_object: class1
+    expression_before: null
+    operation: 设二班x棵，一班x+24棵
+    expression_after: class1=x+24
+    result_value: null
+    unit: null
+    required_understanding: 一班比二班多24
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s2
+    depends_on:
+    - p1_s1
+    goal: 用总数列方程
+    action: build_relation
+    input_objects:
+    - class1
+    - class2
+    - total
+    output_object: null
+    expression_before: null
+    operation: 两班合计126
+    expression_after: x+(x+24)=126
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s3
+    depends_on:
+    - p1_s2
+    goal: 解方程
+    action: solve
+    input_objects: []
+    output_object: class2
+    expression_before: x+(x+24)=126
+    operation: 解方程
+    expression_after: x=51
+    result_value: 51
+    unit: 棵
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 51+(51+24)==126
+  - step_id: p1_s4
+    depends_on:
+    - p1_s3
+    goal: 求一班并检验
+    action: check
+    input_objects:
+    - class2
+    - diff
+    output_object: class1
+    expression_before: null
+    operation: 51+24=75
+    expression_after: class1=75
+    result_value: 75
+    unit: 棵
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 75+51==126 and 75-51==24
+solution_graph:
+  nodes:
+  - node_id: n1
+    label: 设二班x
+    object_ids:
+    - class2
+  - node_id: n2
+    label: 表示一班
+    object_ids:
+    - class1
+    - diff
+  - node_id: n3
+    label: 按总数列方程
+    object_ids:
+    - total
+  - node_id: n4
+    label: 求解检验
+    object_ids:
+    - class1
+    - class2
+  edges:
+  - from: n1
+    to: n2
+  - from: n2
+    to: n3
+  - from: n3
+    to: n4
+  branch_rules: []
+common_errors:
+- error_id: e1
+  type: object_binding
+  student_expression: (126-24)/2 = 75
+  first_error_span: '75'
+  misconception: 公式计算后把较小量与较大量对应反
+  diagnostic_question: 减去相差数再除以2求到的是较大还是较小？
+  preferred_teaching_action: CHECK_OBJECT_BINDING
+- error_id: e2
+  type: relation
+  student_expression: x + 24 = 126
+  first_error_span: x + 24
+  misconception: 遗漏另一个班的数量
+  diagnostic_question: 126棵包含几个班？
+  preferred_teaching_action: CLARIFY_TOTAL
+teaching_boundaries:
+  before_student_final_attempt:
+    allowed:
+    - 询问未知量应设为什么
+    - 询问题目中的核心等量关系
+    - 只提示当前一步，不直接给出最终答案
+    forbidden:
+    - 直接输出最终答案
+    - 一次展示完整方程、求解过程和答案
+  after_student_final_attempt:
+    allowed:
+    - 判断答案是否正确
+    - 要求学生解释等量关系
+    - 引导代回检验
+    forbidden: []
+understanding_checks:
+  explain_why:
+    prompt: 为什么不能用x+24=126？
+    key_elements:
+    - 126是两班总数
+    - 必须把两个班都计入
+    common_weak_answers:
+    - 只说“因为老师这样教”
+    - 只报结果，不解释数量关系
+  error_detection:
+    prompt: 有人算(126-24)÷2=51，却说51是一班，错在哪里？
+    error_example: (126-24)/2=51
+    expected_explanation: 51是较小量二班，不是一班
+  micro_transfer:
+    prompt: 若一班比二班多30棵、总数仍126，只列方程。
+    expected_answer: x+(x+30)=126
+    changed_core_feature: 改变差值
+review:
+  math_reviewer: null
+  pedagogy_reviewer: null
+  reviewed_at: null
+  tool_verification_passed: true
+  notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+type_specific:
+  larger_object_id: class1
+  smaller_object_id: class2
+  total_object_id: total
+  difference_object_id: diff
+  relationship_expressions:
+  - class1 + class2 = total
+  - class1 - class2 = diff

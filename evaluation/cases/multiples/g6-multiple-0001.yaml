@@ -1,0 +1,277 @@
+schema_version: '1.0'
+case_id: g6-multiple-0001
+status: draft
+scope:
+  subject: 数学
+  grade: 六年级
+  domain: 应用题
+  problem_type: multiple
+  subtype: is_times_total
+  difficulty: basic
+  curriculum_tags:
+  - 倍数问题
+  - 方程
+  - 1倍量
+source:
+  origin: original
+  source_reference: null
+  copyright_status: cleared
+problem:
+  text: 体育室有篮球和足球共48个，篮球的数量是足球的3倍。篮球和足球各有多少个？
+  question: 求篮球和足球各有多少个
+  answer_form: quantity_with_unit
+  has_irrelevant_information: false
+  has_implicit_condition: false
+  implicit_conditions: []
+objects:
+- object_id: football
+  name: 足球数量
+  type: amount
+  owner: null
+  value: null
+  unit: 个
+  role: unknown
+  source_span: 足球
+- object_id: basketball
+  name: 篮球数量
+  type: amount
+  owner: null
+  value: null
+  unit: 个
+  role: unknown
+  source_span: 篮球
+- object_id: multiplier
+  name: 倍数
+  type: other
+  owner: null
+  value: 3
+  unit: null
+  role: given
+  source_span: 3倍
+- object_id: total
+  name: 球总数
+  type: amount
+  owner: null
+  value: 48
+  unit: 个
+  role: given
+  source_span: 共48个
+relationships:
+- relationship_id: r1
+  type: multiple
+  natural_language: 篮球是足球的3倍
+  expression: basketball = football * 3
+  operands:
+  - football
+  - multiplier
+  result: basketball
+  required_conditions: []
+- relationship_id: r2
+  type: sum
+  natural_language: 两种球共48个
+  expression: basketball + football = total
+  operands:
+  - basketball
+  - football
+  result: total
+  required_conditions: []
+unit_one:
+  required: false
+  object_id: null
+  evidence: null
+answer:
+  final_value:
+    football: 12
+    basketball: 36
+  unit: 个
+  accepted_forms:
+  - 足球12个，篮球36个
+  validation_expression: 12 + 36 = 48; 36 = 12 * 3
+  internal_only: true
+solution_paths:
+- path_id: path_1
+  method: 设1倍量为x的方程法
+  age_appropriate: true
+  priority: 1
+  prerequisites:
+  - 能识别足球是1倍量
+  steps:
+  - step_id: p1_s1
+    depends_on: []
+    goal: 确定1倍量
+    action: identify
+    input_objects:
+    - football
+    - basketball
+    - multiplier
+    output_object: football
+    expression_before: null
+    operation: 足球是1倍量，设为x
+    expression_after: football=x
+    result_value: null
+    unit: null
+    required_understanding: “篮球是足球的3倍”中足球是标准量
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s2
+    depends_on:
+    - p1_s1
+    goal: 表示比较量
+    action: define
+    input_objects:
+    - football
+    - multiplier
+    output_object: basketball
+    expression_before: null
+    operation: 篮球为3x
+    expression_after: basketball=3x
+    result_value: null
+    unit: null
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s3
+    depends_on:
+    - p1_s2
+    goal: 用总数列方程并求解
+    action: solve
+    input_objects:
+    - total
+    output_object: football
+    expression_before: null
+    operation: x+3x=48
+    expression_after: x=12
+    result_value: 12
+    unit: 个
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 12+3*12==48
+  - step_id: p1_s4
+    depends_on:
+    - p1_s3
+    goal: 求篮球并检验
+    action: check
+    input_objects:
+    - football
+    - multiplier
+    output_object: basketball
+    expression_before: null
+    operation: 3×12=36
+    expression_after: basketball=36
+    result_value: 36
+    unit: 个
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 36==12*3
+solution_graph:
+  nodes:
+  - node_id: n1
+    label: 识别1倍量
+    object_ids:
+    - football
+  - node_id: n2
+    label: 表示3倍量
+    object_ids:
+    - basketball
+  - node_id: n3
+    label: 总数列方程
+    object_ids:
+    - total
+  - node_id: n4
+    label: 求解检验
+    object_ids:
+    - football
+    - basketball
+  edges:
+  - from: n1
+    to: n2
+  - from: n2
+    to: n3
+  - from: n3
+    to: n4
+  branch_rules: []
+common_errors:
+- error_id: e1
+  type: object_binding
+  student_expression: basketball=x, football=3x
+  first_error_span: football=3x
+  misconception: 把标准量和比较量颠倒
+  diagnostic_question: “谁是谁的3倍”里谁是1倍量？
+  preferred_teaching_action: IDENTIFY_BASE_AMOUNT
+- error_id: e2
+  type: operation
+  student_expression: x+3=48
+  first_error_span: '+3'
+  misconception: 把3倍当成多3个
+  diagnostic_question: 3倍表示乘3还是加3？
+  preferred_teaching_action: CLARIFY_MULTIPLIER
+teaching_boundaries:
+  before_student_final_attempt:
+    allowed:
+    - 询问未知量应设为什么
+    - 询问题目中的核心等量关系
+    - 只提示当前一步，不直接给出最终答案
+    forbidden:
+    - 直接输出最终答案
+    - 一次展示完整方程、求解过程和答案
+  after_student_final_attempt:
+    allowed:
+    - 判断答案是否正确
+    - 要求学生解释等量关系
+    - 引导代回检验
+    forbidden: []
+understanding_checks:
+  explain_why:
+    prompt: 为什么足球适合设为x，而篮球写成3x？
+    key_elements:
+    - 足球是1倍量
+    - 篮球是比较量
+    common_weak_answers:
+    - 只说“因为老师这样教”
+    - 只报结果，不解释数量关系
+  error_detection:
+    prompt: 小明写x+3=48，他把哪个词理解错了？
+    error_example: x+3=48
+    expected_explanation: “3倍”不是“多3个”
+  micro_transfer:
+    prompt: 若篮球是足球4倍、总数50个，只列方程。
+    expected_answer: x+4x=50
+    changed_core_feature: 改变倍数
+review:
+  math_reviewer: null
+  pedagogy_reviewer: null
+  reviewed_at: null
+  tool_verification_passed: true
+  notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+type_specific:
+  base_object_id: football
+  compared_object_id: basketball
+  multiplier: 3
+  phrase_type: is_times
+  normalized_relationship: basketball = football * 3

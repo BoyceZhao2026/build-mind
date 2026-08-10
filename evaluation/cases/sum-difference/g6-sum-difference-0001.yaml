@@ -1,0 +1,280 @@
+schema_version: '1.0'
+case_id: g6-sum-difference-0001
+status: draft
+scope:
+  subject: 数学
+  grade: 六年级
+  domain: 应用题
+  problem_type: sum_difference
+  subtype: total_and_difference
+  difficulty: basic
+  curriculum_tags:
+  - 和差问题
+  - 方程
+  - 等量关系
+source:
+  origin: original
+  source_reference: null
+  copyright_status: cleared
+problem:
+  text: 图书角有故事书和科技书共84本，科技书比故事书多18本。故事书和科技书各有多少本？
+  question: 求故事书和科技书各有多少本
+  answer_form: quantity_with_unit
+  has_irrelevant_information: false
+  has_implicit_condition: false
+  implicit_conditions: []
+objects:
+- object_id: story_books
+  name: 故事书
+  type: amount
+  owner: null
+  value: null
+  unit: 本
+  role: unknown
+  source_span: 故事书
+- object_id: science_books
+  name: 科技书
+  type: amount
+  owner: null
+  value: null
+  unit: 本
+  role: unknown
+  source_span: 科技书
+- object_id: total_books
+  name: 总本数
+  type: amount
+  owner: null
+  value: 84
+  unit: 本
+  role: given
+  source_span: 共84本
+- object_id: difference
+  name: 相差本数
+  type: amount
+  owner: null
+  value: 18
+  unit: 本
+  role: given
+  source_span: 多18本
+relationships:
+- relationship_id: r1
+  type: sum
+  natural_language: 故事书与科技书合计84本
+  expression: story_books + science_books = total_books
+  operands:
+  - story_books
+  - science_books
+  result: total_books
+  required_conditions: []
+- relationship_id: r2
+  type: difference
+  natural_language: 科技书比故事书多18本
+  expression: science_books - story_books = difference
+  operands:
+  - science_books
+  - story_books
+  result: difference
+  required_conditions: []
+unit_one:
+  required: false
+  object_id: null
+  evidence: null
+answer:
+  final_value:
+    story_books: 33
+    science_books: 51
+  unit: 本
+  accepted_forms:
+  - 故事书33本，科技书51本
+  - 33本和51本
+  validation_expression: 33 + 51 = 84; 51 - 33 = 18
+  internal_only: true
+solution_paths:
+- path_id: path_1
+  method: 设较小量为 x 的方程法
+  age_appropriate: true
+  priority: 1
+  prerequisites:
+  - 理解较大量=较小量+相差数
+  steps:
+  - step_id: p1_s1
+    depends_on: []
+    goal: 确定未知量并表示另一量
+    action: define
+    input_objects:
+    - story_books
+    - difference
+    output_object: science_books
+    expression_before: null
+    operation: 设故事书为 x 本，则科技书为 x+18 本
+    expression_after: science_books = x + 18
+    result_value: null
+    unit: null
+    required_understanding: 同一个 x 表示较小量，较大量要多18本
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s2
+    depends_on:
+    - p1_s1
+    goal: 根据总数建立方程
+    action: build_relation
+    input_objects:
+    - story_books
+    - science_books
+    - total_books
+    output_object: null
+    expression_before: null
+    operation: 两种书的数量和等于84
+    expression_after: x + (x + 18) = 84
+    result_value: null
+    unit: null
+    required_understanding: 总数关系提供等号两边相等的依据
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+  - step_id: p1_s3
+    depends_on:
+    - p1_s2
+    goal: 解出故事书数量
+    action: solve
+    input_objects: []
+    output_object: story_books
+    expression_before: x + (x + 18) = 84
+    operation: 解一元一次方程
+    expression_after: x = 33
+    result_value: 33
+    unit: 本
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 33 + (33 + 18) == 84
+  - step_id: p1_s4
+    depends_on:
+    - p1_s3
+    goal: 求科技书并检验
+    action: check
+    input_objects:
+    - story_books
+    - difference
+    output_object: science_books
+    expression_before: null
+    operation: 33+18=51，并检查和与差
+    expression_after: science_books = 51
+    result_value: 51
+    unit: 本
+    required_understanding: null
+    allowed_hint_levels:
+      L1: 提醒相关概念，不给具体算式
+      L2: 聚焦题目中的关键条件
+      L3: 提示应建立的关系方向
+      L4: 拆出当前一个小步骤
+    forbidden_before_student_attempt:
+    - 直接给出本步之后的完整答案
+    verification:
+      tool: rule
+      assertion: 33 + 51 == 84 and 51 - 33 == 18
+solution_graph:
+  nodes:
+  - node_id: n1
+    label: 设故事书为x
+    object_ids:
+    - story_books
+  - node_id: n2
+    label: 表示科技书
+    object_ids:
+    - science_books
+    - difference
+  - node_id: n3
+    label: 利用总数列方程
+    object_ids:
+    - total_books
+  - node_id: n4
+    label: 求解并代回检验
+    object_ids:
+    - story_books
+    - science_books
+  edges:
+  - from: n1
+    to: n2
+  - from: n2
+    to: n3
+  - from: n3
+    to: n4
+  branch_rules: []
+common_errors:
+- error_id: e1
+  type: relation
+  student_expression: x + 18 = 84
+  first_error_span: x + 18
+  misconception: 把总数误当成“科技书数量”
+  diagnostic_question: 84本表示一种书的数量还是两种书的总数？
+  preferred_teaching_action: CLARIFY_TOTAL
+- error_id: e2
+  type: object_binding
+  student_expression: x + (x - 18) = 84
+  first_error_span: x - 18
+  misconception: 把“科技书比故事书多18本”的方向写反
+  diagnostic_question: 哪一种书更多？如果故事书是x，科技书应该比x大还是小？
+  preferred_teaching_action: CLARIFY_DIFFERENCE_DIRECTION
+teaching_boundaries:
+  before_student_final_attempt:
+    allowed:
+    - 询问未知量应设为什么
+    - 询问题目中的核心等量关系
+    - 只提示当前一步，不直接给出最终答案
+    forbidden:
+    - 直接输出最终答案
+    - 一次展示完整方程、求解过程和答案
+  after_student_final_attempt:
+    allowed:
+    - 判断答案是否正确
+    - 要求学生解释等量关系
+    - 引导代回检验
+    forbidden: []
+understanding_checks:
+  explain_why:
+    prompt: 为什么设故事书为x后，科技书要写成x+18？
+    key_elements:
+    - 科技书更多
+    - 相差18本
+    common_weak_answers:
+    - 只说“因为老师这样教”
+    - 只报结果，不解释数量关系
+  error_detection:
+    prompt: 小华列出 x+(x-18)=84，这里哪里错了？
+    error_example: x + (x - 18) = 84
+    expected_explanation: 把“科技书更多”写成了更少18本
+  micro_transfer:
+    prompt: 如果总数改成100本、相差仍是18本，只列方程不求解。
+    expected_answer: x + (x + 18) = 100
+    changed_core_feature: 改变总数，保持和差关系
+review:
+  math_reviewer: null
+  pedagogy_reviewer: null
+  reviewed_at: null
+  tool_verification_passed: true
+  notes: 程序校验基础数值关系；仍需人工数学与教学审核。
+type_specific:
+  larger_object_id: science_books
+  smaller_object_id: story_books
+  total_object_id: total_books
+  difference_object_id: difference
+  relationship_expressions:
+  - science_books + story_books = total_books
+  - science_books - story_books = difference
