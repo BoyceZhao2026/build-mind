@@ -6,18 +6,22 @@
 - [2. 总体技术栈](#2-总体技术栈)
   - [2.1 纯技术架构图](#21-纯技术架构图)
   - [2.2 技术栈清单](#22-技术栈清单)
+  - [2.3 LLM 多模型适配与对比机制](#23-llm-多模型适配与对比机制)
+  - [2.4 已确定的 Demo 选型](#24-已确定的-demo-选型)
 - [3. 3.0 图片题目上传、识别与结构化](#3-30-图片题目上传识别与结构化)
 - [4. 3.1 学生数学步骤的理解与判断](#4-31-学生数学步骤的理解与判断)
 - [5. 3.2 引导式教学状态机](#5-32-引导式教学状态机)
 - [6. 3.3 数学正确性与答案防泄露](#6-33-数学正确性与答案防泄露)
 - [7. 3.4 实时语音的轮次判断](#7-34-实时语音的轮次判断)
 - [8. 3.5 数学语音识别与上下文纠错](#8-35-数学语音识别与上下文纠错)
+  - [8.2 普通话 STT 候选对比](#82-普通话-stt-候选对比)
 - [9. 3.6 语音、字幕和 AI 黑板同步](#9-36-语音字幕和-ai-黑板同步)
+  - [9.1 中文 TTS 候选对比](#91-中文-tts-候选对比)
 - [10. 3.7 打断、取消和异步任务一致性](#10-37-打断取消和异步任务一致性)
 - [11. 3.8 端到端延迟](#11-38-端到端延迟)
 - [12. Demo 模块结构](#12-demo-模块结构)
 - [13. 实施顺序](#13-实施顺序)
-- [14. 待讨论的选型](#14-待讨论的选型)
+- [14. 已确认事项与待讨论项](#14-已确认事项与待讨论项)
 
 ## 1. Demo 技术边界
 
@@ -108,10 +112,10 @@ flowchart TB
 
     subgraph Adapters[外部能力适配层]
         direction LR
-        VisionAdapter[VisionRecognitionAdapter<br/>多模态题目识别]
+        VisionAdapter[VisionRecognitionAdapter<br/>qwen3-vl-flash]
         LLMAdapter[LLMAdapter<br/>理解、引导与结构化输出]
-        STTAdapter[STTAdapter<br/>普通话语音转文字]
-        TTSAdapter[TTSAdapter<br/>中文语音合成]
+        STTAdapter[STTAdapter<br/>阿里云 Fun-ASR Realtime]
+        TTSAdapter[TTSAdapter<br/>阿里云 CosyVoice Realtime]
     end
 
     subgraph Deterministic[确定性计算层]
@@ -174,7 +178,7 @@ flowchart TB
 | 数学展示 | KaTeX | 稳定显示公式，不使用图片公式 |
 | 图片输入 | HTML 文件选择器 | 桌面 Web 手动选择本地图片，不调用摄像头 |
 | 图片预处理 | 浏览器 Canvas + 后端 Pillow | 前端压缩预览，后端校正方向并检查尺寸 |
-| 题目识别 | `VisionRecognitionAdapter` + 多模态视觉模型 | Demo 直接识别印刷体应用题，避免先建设复杂 OCR 系统 |
+| 题目识别 | `VisionRecognitionAdapter` + `qwen3-vl-flash` | Demo 直接识别印刷体应用题，避免先建设复杂 OCR 系统 |
 | 题目结构化 | LLM 结构化输出 + Pydantic | 将学生确认后的题目转换为对象、关系和目标 |
 | 音频采集 | 浏览器 `getUserMedia` + `MediaRecorder` | 浏览器原生能力，适合半双工录音 |
 | 实时事件 | 原生 WebSocket | 双向发送会话事件、字幕和黑板更新 |
@@ -186,10 +190,105 @@ flowchart TB
 | 数据存储 | SQLite + JSON 字段/文本 | 单机 Demo 足够，便于直接检查和重放 |
 | 金标准 | YAML 文件 | 已有种子数据，人工可读、方便版本管理 |
 | 模型调用 | `LLMAdapter` 抽象 | 不把核心业务绑定到具体模型厂商 |
-| 语音识别 | `STTAdapter` 抽象 | 先接一个普通话效果较好的服务，后续可替换 |
-| 语音合成 | `TTSAdapter` 抽象 | 先保证低延迟和可懂度，不做多音色 |
+| 语音识别 | `STTAdapter` + 阿里云 Fun-ASR Realtime | 使用 WebSocket 流式识别、热词和上下文增强，同时保留替换能力 |
+| 语音合成 | `TTSAdapter` + 阿里云 CosyVoice Realtime | 使用 WebSocket 流式合成，首版只选择一个系统音色 |
 | 日志 | 结构化 JSON 日志 + `trace_id` | 还原每轮输入、状态、校验和输出 |
 | 测试 | pytest | 对金标准、状态机、校验器和回归场景统一测试 |
+
+### 2.3 LLM 多模型适配与对比机制
+
+Demo 不把业务代码直接绑定到某个模型 SDK。所有文本模型通过统一 `LLMAdapter` 调用，并将厂商差异限制在 Provider 实现内部。
+
+```python
+class LLMRequest(BaseModel):
+    task: Literal[
+        "problem_structure",
+        "student_step_analysis",
+        "hint_generation",
+        "response_review",
+    ]
+    messages: list[dict]
+    response_schema: dict | None = None
+    temperature: float = 0.0
+    trace_id: str
+
+class LLMResult(BaseModel):
+    provider: str
+    model: str
+    content: str
+    parsed: dict | None
+    input_tokens: int | None
+    output_tokens: int | None
+    latency_ms: int
+    finish_reason: str | None
+
+class LLMAdapter(Protocol):
+    async def generate(self, request: LLMRequest) -> LLMResult:
+        ...
+```
+
+建议的实现结构：
+
+```text
+adapters/llm/
+├── base.py
+├── registry.py
+├── openai_compatible.py
+├── provider_a.py
+├── provider_b.py
+└── fake.py
+```
+
+`registry.py` 根据配置创建模型，不让业务层出现厂商名称：
+
+```yaml
+llm_profiles:
+  tutor_primary:
+    provider: provider_a
+    model: model_a
+    temperature: 0.2
+  response_reviewer:
+    provider: provider_b
+    model: model_b
+    temperature: 0.0
+```
+
+模型对比支持两种模式：
+
+- **离线回放**：将同一批金标准输入依次发送给多个模型，比较结构化输出正确率、步骤定位准确率、答案泄露率、延迟和成本。这是 Demo 首选。
+- **影子调用**：真实会话只采用主模型的结果，同时异步调用候选模型并保存结果，不影响学生体验。首版可暂不启用，避免增加成本和链路复杂度。
+
+对比必须固定提示词版本、输入、Schema 和采样参数，并记录：
+
+```json
+{
+  "prompt_version": "student_analyzer_v1",
+  "provider": "...",
+  "model": "...",
+  "case_id": "g6-motion-0001",
+  "schema_valid": true,
+  "gold_score": 0.92,
+  "answer_leakage": false,
+  "latency_ms": 840,
+  "estimated_cost": 0.0012
+}
+```
+
+模型失败时统一归一为 `LLMError`，至少区分超时、限流、鉴权失败、内容过滤、Schema 校验失败和供应商服务错误。Demo 可以手动切换模型，但不需要实现生产级自动容灾。
+
+### 2.4 已确定的 Demo 选型
+
+| 决策项 | 当前结论 |
+| --- | --- |
+| 运行方式 | 仅本地运行 |
+| 前端 | Next.js App Router + TypeScript，由实现阶段按 Demo 效率调整 UI |
+| 图片识别 | 阿里云百炼 `qwen3-vl-flash` |
+| LLM | 通过 `LLMAdapter` 支持多个模型，主模型和审核模型稍后通过评测确定 |
+| 语音识别 | 阿里云百炼 Fun-ASR Realtime，通过 `STTAdapter` 接入 |
+| 语音合成 | 阿里云百炼 CosyVoice Realtime，通过 `TTSAdapter` 接入 |
+| 核心交互 | 语音通话是核心路径，不接受用纯文本闭环替代 MVP 验证 |
+| 陌生题 | 未匹配金标准也继续辅导，但标记低置信度原因并进入事后质量抽查队列 |
+| 评测数据 | 当前 `evaluation/` YAML 作为加载器初始 Schema，后续变更必须兼容或提供迁移脚本 |
 
 官方能力参考：
 
@@ -311,7 +410,7 @@ Demo 中的质量检查只作为预警，不能假设简单模糊分数能够准
 
 ### 3.6 识别技术选型
 
-Demo 首选“多模态视觉模型直接忠实转写”，暂不组合传统 OCR 与公式 OCR。
+Demo 确定使用阿里云百炼 **`qwen3-vl-flash`** 做多模态图片识别，采用“视觉模型直接忠实转写”，暂不组合传统 OCR 与公式 OCR。该模型支持图片输入和结构化输出，适合将题目转写结果约束为统一 JSON；调用仍通过 `VisionRecognitionAdapter`，避免业务层绑定阿里云 SDK。
 
 选择原因：
 
@@ -319,6 +418,17 @@ Demo 首选“多模态视觉模型直接忠实转写”，暂不组合传统 OC
 - 需要同时理解自然阅读顺序、题干和简单版面。
 - Demo 重点是验证拍题进入教学闭环，不是比较 OCR 引擎。
 - 可以通过适配器在后续替换为专业 OCR 或双模型校验。
+
+模型调用约束：
+
+- 默认使用非思考模式，任务仅限忠实转写和区域信息提取。
+- 提示词明确禁止解题、补全缺失条件或根据常识修改数字。
+- 使用 JSON Schema 约束输出为 `ImageRecognitionResult`。
+- 保存模型 ID、模型快照版本、请求耗时与不确定字段，便于识别回归测试。
+- API Key 只保存在本地后端环境变量中，不进入浏览器代码、日志或 Git。
+- 若别名模型升级导致结果波动，可切换到固定快照版本复现实验。
+
+官方模型说明：[阿里云百炼 qwen3-vl-flash](https://help.aliyun.com/zh/model-studio/qwen3-vl-flash)。
 
 接口：
 
@@ -460,11 +570,34 @@ Demo 可以尝试用确认文本的标准化哈希或文本相似度匹配 `eval
 
 没有匹配
 → 标记为陌生题
-→ D0 可拒绝或进入人工审核
-→ 后续再增加在线参考解法生成
+→ 在线生成候选参考解法并运行数学校验
+→ 进入语音辅导
+→ 标记低置信度原因，供开发者事后抽查
 ```
 
-为了先验证教学业务，Demo 第一版建议只允许匹配到金标准的题目进入完整辅导。陌生题仍可展示识别和结构化结果，但不承诺开始可靠教学。
+Demo **不因未匹配金标准而拒绝题目**。金标准用于提供更强的可验证证据，而不是支持题目的白名单。陌生题仍进入完整语音辅导，但系统应采取更保守的策略：在线生成 1～2 条候选参考解法，使用 SymPy/Pint/规则做能完成的校验，降低自动推进阈值，并在不确定时向学生澄清。
+
+这里的“审核”是**开发者事后质量抽查**，不是辅导开始前的人工审批，学生不需要等待。需要抽查的原因包括：
+
+- 没有人工确认的参考解法和步骤图，步骤定位更容易发生歧义。
+- 某些自然语言关系无法由 SymPy/Pint 完整证明，模型可能生成逻辑上不可靠的路径。
+- 缺少金标准时，系统无法自动计算步骤对齐准确率和答案防泄露等离线指标。
+- 陌生题可能超出当前七类题型、包含缺失条件或复杂图表。
+
+抽查记录应包含机器可读的原因码：
+
+```python
+review_reasons: list[Literal[
+    "gold_case_not_found",
+    "solution_generation_disagreement",
+    "math_verification_unknown",
+    "step_alignment_low_confidence",
+    "unsupported_problem_structure",
+    "student_challenged_ai",
+]]
+```
+
+学生侧不显示“审核失败”等内部措辞，只在确有风险时提示：“这道题我需要更谨慎地核对，我们一步一步确认。”
 
 ### 3.12 Demo 验收标准
 
@@ -812,7 +945,38 @@ class TranscriptResult(BaseModel):
     provider_metadata: dict
 ```
 
-### 8.2 数学规范化
+### 8.2 普通话 STT 候选对比
+
+语音通话是核心路径，因此只比较支持流式或准实时识别、能够持续返回中间结果的服务。最终选择不能只看通用中文准确率，必须使用六年级数学口语集实测。
+
+| 候选 | 实时接口与关键能力 | 对本 Demo 的优势 | 需要验证的风险 | 当前建议 |
+| --- | --- | --- | --- | --- |
+| 阿里云百炼 Fun-ASR Realtime | WebSocket；普通话；热词、上下文增强、时间戳、中间结果 | 与 `qwen3-vl-flash` 可共用百炼账号体系；上下文增强适合题目数字、单位和专有表达 | 数学符号口述、分数和自我纠正的识别效果仍需实测 | **Demo 已选定** |
+| 腾讯云实时语音识别 V2 | WebSocket；流式识别；普通话、方言和中间结果 | 国内网络接入成熟，可作为独立供应商对照 | 热词配置方式、最终句稳定时间和价格需按实际账号验证 | **第二对比候选** |
+| 火山引擎大模型流式 ASR | 双向流式；面向实时字幕和智能体对话 | 候选模型和语音产品线完整，适合比较自然口语 | 接口版本较多，需要确认所选资源与鉴权方式 | 第三对比候选 |
+| 百度智能云实时 ASR | WebSocket；临时和最终结果；时间戳 | 接口直接，适合作为普通话基线 | 需要验证数学上下文增强能力和中间结果抖动 | 基线候选 |
+
+Demo 只实现阿里云 Fun-ASR Realtime。腾讯云、火山引擎和百度智能云保留为未来效果或成本不达标时的替换候选，首版不接入。业务层仍必须通过 `STTAdapter` 调用，不能直接依赖 DashScope SDK 的返回结构。
+
+STT 评测集至少包含：
+
+- `3/5`、“五分之三”和“单位一”等分数表达。
+- `25%`、“百分之二十五”和“打八折”等百分数表达。
+- `x`、乘号、除号、等号及“设未知数”等方程表达。
+- 米/秒、千米/小时、人/天等单位。
+- “不对，我刚才说错了，应该是……”这种自我纠正。
+- 犹豫、重复、停顿、儿童音高和轻微环境噪声。
+
+比较指标：数字与运算符准确率、数学表达完全正确率、最终文本准确率、中间字幕稳定性、首个中间结果延迟、最终结果延迟、热词收益和单分钟成本。普通 WER 只作为辅助指标。
+
+官方资料：
+
+- [阿里云百炼实时语音识别](https://help.aliyun.com/zh/model-studio/real-time-speech-recognition-user-guide)
+- [腾讯云 AI 智能语音功能介绍](https://cloud.tencent.com/document/product/647/131325)
+- [火山引擎大模型流式语音识别](https://www.volcengine.com/docs/6561/1354871?lang=zh)
+- [百度智能云实时语音识别 WebSocket API](https://cloud.baidu.com/doc/SPEECH/s/jlbxejt2i)
+
+### 8.3 数学规范化
 
 ASR 后单独执行 `MathSpeechNormalizer`：
 
@@ -834,7 +998,7 @@ class NormalizedTranscript(BaseModel):
     requires_confirmation: bool
 ```
 
-### 8.3 风险规则
+### 8.4 风险规则
 
 以下变化必须确认：
 
@@ -846,7 +1010,7 @@ class NormalizedTranscript(BaseModel):
 - 单位。
 - “这里”“那个数”等存在多个候选对象的指代。
 
-### 8.4 Demo 交互
+### 8.5 Demo 交互
 
 - 页面同时显示原始转写和规范化数学表达。
 - 高风险 token 使用高亮。
@@ -854,7 +1018,7 @@ class NormalizedTranscript(BaseModel):
 - 如果本轮没有数学表达，只是“我不理解”，可以直接通过。
 - Demo 不静默修正关键数学内容。
 
-### 8.5 Demo 简化
+### 8.6 Demo 简化
 
 - D0 阶段可先允许学生手动编辑 ASR 结果。
 - 不训练数学 ASR 模型。
@@ -863,7 +1027,38 @@ class NormalizedTranscript(BaseModel):
 
 ## 9. 3.6 语音、字幕和 AI 黑板同步
 
-### 9.1 AI 黑板实现
+### 9.1 中文 TTS 候选对比
+
+TTS 需要支持边合成边播放或足够低的首包延迟。对本产品而言，“像老师一样清楚、耐心、有停顿”比音色数量和声音复刻更重要。
+
+| 候选 | 流式能力与特点 | 对本 Demo 的优势 | 需要验证的风险 | 当前建议 |
+| --- | --- | --- | --- | --- |
+| 阿里云百炼 CosyVoice Realtime | WebSocket 双向流式；支持流式输入输出、语速/语调控制、多种音频格式 | 与视觉模型及 STT 账号体系一致；Python 接入方便 | 数学式、单位和长数字的停顿与读法需实测 | **Demo 已选定** |
+| 阿里云百炼 Qwen-TTS Realtime | 实时合成；可通过指令控制表达方式 | 有机会用指令形成耐心、简洁的老师语气 | 指令稳定性、延迟和成本需要与 CosyVoice 对照 | 同厂增强候选 |
+| 腾讯云对话式 TTS `flow_02_turbo` | SSE 流式；官方定位实时对话，支持中文和多种音色 | 文档明确面向低延迟对话，可作为跨厂商强对照 | SSE 分段、取消播放和浏览器音频缓冲需要验证 | **第二对比候选** |
+| 火山引擎豆包语音合成 | 提供流式语音合成与多种中文音色 | 中文自然度和风格选择值得试听 | 接口版本与音色兼容关系需要固定后再实现 | 第三对比候选 |
+| 百度智能云流式文本合成 | WebSocket，支持边合成边播放 | 可作为独立基础服务对照 | 教学语气、数学朗读和首包延迟需要实测 | 基线候选 |
+
+Demo 只实现阿里云 CosyVoice Realtime。腾讯云、火山引擎和百度智能云保留为未来效果或成本不达标时的替换候选，首版不接入。仍需在 CosyVoice 的系统音色中做小规模盲听，确定默认音色、语速和停顿策略。
+
+TTS 评测文本至少覆盖：
+
+- “五分之三”“百分之二十五”“每小时 60 千米”。
+- `120 ÷ 3 = 40`、括号和未知数等数学表达。
+- 提问、鼓励、纠错和等待学生继续说四种语气。
+- 20～80 字的短句，以及分句连续播放。
+- 学生点击打断后的停止耗时，确保旧音频不会继续播放。
+
+核心指标：首包延迟、整句合成耗时、自然度、可懂度、数学朗读正确率、分句衔接、打断停止耗时和成本。声音复刻不进入 Demo 范围。
+
+官方资料：
+
+- [阿里云百炼实时语音合成](https://help.aliyun.com/zh/model-studio/realtime-tts-user-guide)
+- [腾讯云对话式语音合成](https://cloud.tencent.com/document/product/647/131300)
+- [火山引擎豆包语音合成 WebSocket 接口](https://www.volcengine.com/docs/6561/2228192?lang=zh)
+- [百度智能云流式文本在线合成](https://cloud.baidu.com/doc/SPEECH/s/lm5xd63rn)
+
+### 9.2 AI 黑板实现
 
 使用普通 React DOM 组件，不使用 Canvas：
 
@@ -878,7 +1073,7 @@ RecentCaption
 
 公式通过 KaTeX 渲染，黑板状态由服务端输出包驱动。
 
-### 9.2 事件协议
+### 9.3 事件协议
 
 FastAPI WebSocket 发送带版本的事件：
 
@@ -899,7 +1094,7 @@ class TutorEvent(BaseModel):
     payload: dict
 ```
 
-### 9.3 同步策略
+### 9.4 同步策略
 
 - 服务端先生成并审核整个 `TeachingOutputPackage`。
 - 审核通过后，先发送字幕和黑板 patch。
@@ -908,7 +1103,7 @@ class TutorEvent(BaseModel):
 - 播放结束后隐藏临时字幕，保留当前任务和已确认步骤。
 - 客户端拒绝低于当前 `state_version` 的事件。
 
-### 9.4 黑板 patch
+### 9.5 黑板 patch
 
 ```json
 {
@@ -923,7 +1118,7 @@ class TutorEvent(BaseModel):
 }
 ```
 
-### 9.5 Demo 简化
+### 9.6 Demo 简化
 
 - 不做逐字字幕高亮。
 - 不做动画公式推导。
@@ -1112,7 +1307,7 @@ Demo 初期也可以把 `web/` 和 `api/` 都放在当前仓库中，不需要�
 
 1. 实现桌面 Web 本地图片手动上传。
 2. 实现图片类型、尺寸和方向检查。
-3. 接入一个 `VisionRecognitionAdapter` 实现。
+3. 通过 `VisionRecognitionAdapter` 接入 `qwen3-vl-flash`。
 4. 展示原图与可编辑识别文本。
 5. 实现关键字段高亮和学生确认。
 6. 将确认文本结构化为 `Problem`。
@@ -1120,7 +1315,7 @@ Demo 初期也可以把 `web/` 和 `api/` 都放在当前仓库中，不需要�
 
 验收重点：图片中的题目能准确、可控地进入教学系统。
 
-### D1：文本教学闭环
+### D1：教学核心与语音通话骨架
 
 1. 加载 YAML 金标准。
 2. 实现 Pydantic 领域模型。
@@ -1128,19 +1323,20 @@ Demo 初期也可以把 `web/` 和 `api/` 都放在当前仓库中，不需要�
 4. 实现 Student State Analyzer。
 5. 实现显式状态机和策略规则。
 6. 实现统一输出包与 Guard。
-7. 建立三栏调试页面。
+7. 同时接入 MediaRecorder、STTAdapter 和 TTSAdapter 的最小实现。
+8. 建立包含通话按钮、字幕和黑板的三栏调试页面。
 
-验收重点：3.1、3.2、3.3。
+验收重点：学生从题目确认页进入语音通话，并至少完成一轮“学生说话 → STT → 引导生成 → TTS 播放”。纯文本页面不能作为这一阶段的验收结果。
 
-### D2：半双工语音
+### D2：完整半双工语音教学闭环
 
-1. 接入 MediaRecorder。
-2. 接入一个 STTAdapter 实现。
-3. 增加数学语音规范化和确认。
-4. 接入一个 TTSAdapter 实现。
-5. 通过 WebSocket 推送字幕、状态和黑板 patch。
+1. 增加数学语音规范化和关键表达确认。
+2. 将 3.1～3.3 的教学核心完整接入每个语音轮次。
+3. 通过 WebSocket 推送中间字幕、最终字幕、状态和黑板 patch。
+4. 使用数学语音评测集验证 Fun-ASR Realtime，并试听、调校 CosyVoice Realtime 的默认音色和参数。
+5. 支持学生主动结束发言和打断 AI 播放。
 
-验收重点：3.4、3.5、3.6。
+验收重点：3.1～3.6 的端到端业务闭环。语音通话属于 Demo 的必选核心能力，不安排“先用纯文本版本验证完再决定是否接语音”的路线。
 
 ### D3：打断与延迟优化
 
@@ -1152,16 +1348,22 @@ Demo 初期也可以把 `web/` 和 `api/` 都放在当前仓库中，不需要�
 
 验收重点：3.7、3.8。
 
-## 14. 待讨论的选型
+## 14. 已确认事项与待讨论项
 
-开始编码前仍需确定：
+本轮已经确认：
+
+1. LLM 必须封装为可替换的 `LLMAdapter`，支持多模型离线回放对比。
+2. 图片识别使用阿里云百炼 `qwen3-vl-flash`。
+3. STT 使用阿里云百炼 Fun-ASR Realtime，但保留 `STTAdapter` 抽象。
+4. TTS 使用阿里云百炼 CosyVoice Realtime，但保留 `TTSAdapter` 抽象。
+5. 前端使用 Next.js + TypeScript，具体 UI 以 Demo 开发效率为准。
+6. 语音通话是核心路径，纯文本闭环不能代替 Demo 验收。
+7. 未匹配金标准的题目不拒绝，继续辅导并记录事后质量抽查原因。
+8. Demo 仅在本地运行。
+9. 当前 `evaluation/` YAML 是初始统一 Schema。
+
+编码前仍需通过小规模实测确定：
 
 1. 使用哪个 LLM 作为 Demo 主模型和审核模型。
-2. 使用哪个多模态视觉模型完成图片忠实转写。
-3. 使用哪个普通话 STT 服务。
-4. 使用哪个中文 TTS 服务。
-5. 前端是否确认使用 Next.js，还是采用更轻的 Vite + React。
-6. 是否接受先完成图片上传和文本教学闭环，再接语音。
-7. 未匹配金标准的陌生题在 Demo 中直接拒绝，还是允许人工审核后继续。
-8. Demo 是否只在本地运行，还是需要部署给外部测试者。
-9. `evaluation/` 中现有 YAML 是否已经符合加载器所需的统一 Schema。
+2. CosyVoice 使用哪个系统音色，以及默认语速、停顿参数。
+3. LLM 主模型和审核模型是否必须来自不同模型系列，以降低同源错误风险。
