@@ -4,7 +4,7 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { API_BASE, apiJson, upload } from "@/lib/api";
 import { browserRecordingToWav } from "@/lib/audio";
 
-type Stage = "upload" | "confirm" | "ready" | "call";
+type Stage = "upload" | "confirm" | "ready" | "call" | "geometry";
 type Problem = {
   problem_id: string;
   confirmed_text: string;
@@ -37,6 +37,20 @@ type BusinessTrace = {
   solution_status?: "in_progress" | "solved" | "understanding_verified";
   guard?: { decision?: string; violations?: string[]; leakage_safe?: boolean };
 };
+type GeometryPoint = { x: number; y: number };
+type GeometryResult = {
+  operation: {
+    status: "valid" | "invalid" | "incomplete";
+    output_entities: string[];
+    output_regions: { points: GeometryPoint[] }[];
+    checks: { check: string; passed: boolean; detail: string }[];
+    reason?: string | null;
+  };
+  algebraic_constraints: string[];
+  result_summary?: string | null;
+  verification_trace: { trace_id: string; rule_id: string; status: string; produced_constraints: string[] }[];
+  diagram_patch: { caption: string; focus_entities: string[] };
+};
 
 const SAMPLE_TEXT = "甲、乙两人同时从相距360米的两地相向而行。甲每分钟走50米，乙每分钟走70米。几分钟后两人相遇？";
 
@@ -56,6 +70,7 @@ export default function Home() {
   const [status, setStatus] = useState("等待上传题目");
   const [error, setError] = useState("");
   const [debugText, setDebugText] = useState("");
+  const [geometryResult, setGeometryResult] = useState<GeometryResult | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -232,6 +247,40 @@ export default function Home() {
     }
   }
 
+  async function validateGeometryDemo() {
+    setProcessing(true);
+    setError("");
+    setStatus("正在验证辅助线、区域覆盖和面积关系…");
+    try {
+      const result = await apiJson<GeometryResult>("/api/geometry/validate-split", {
+        method: "POST",
+        body: JSON.stringify({
+          problem_version: 1,
+          diagram_version: 1,
+          original_region_id: "region_shaded",
+          original_region: { points: [
+            { x: 0.1, y: 0.1 }, { x: 0.9, y: 0.1 },
+            { x: 0.9, y: 0.9 }, { x: 0.1, y: 0.9 },
+          ] },
+          splitter_id: "helper_split_1",
+          splitter: { start: { x: 0.5, y: 0.1 }, end: { x: 0.5, y: 0.9 } },
+          expected_part_shape: "rectangle",
+          part_dimensions: [
+            { width: { value: 4, unit: "cm" }, height: { value: 8, unit: "cm" } },
+            { width: { value: 4, unit: "cm" }, height: { value: 8, unit: "cm" } },
+          ],
+        }),
+      });
+      setGeometryResult(result);
+      setStatus(result.operation.status === "valid" ? "辅助线与面积关系已经验证" : "这条辅助线还不能形成有效解法");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "图形验证失败");
+      setStatus("图形验证失败，请检查 API 日志");
+    } finally {
+      setProcessing(false);
+    }
+  }
+
   async function speak(text: string) {
     stopSpeaking();
     setSpeaking(true);
@@ -272,6 +321,7 @@ export default function Home() {
     recorderRef.current?.state === "recording" && recorderRef.current.stop();
     setStage("upload"); setImageUrl(""); setRecognizedText(""); setProblem(null);
     setSession(null); setMessages([]); setBlackboard(null); setBusinessTrace(null); setCompletionSummary(null); setError("");
+    setGeometryResult(null);
     setStatus("等待上传题目");
   }
 
@@ -285,11 +335,11 @@ export default function Home() {
 
       {stage !== "call" ? (
         <section className="setupShell">
-          <div className="progress">
+          {stage !== "geometry" && <div className="progress">
             {[["upload", "1", "上传题目"], ["confirm", "2", "确认题目"], ["ready", "3", "开始辅导"]].map(([key, n, label]) => (
               <div key={key} className={`progressItem ${stage === key ? "active" : ""}`}><b>{n}</b><span>{label}</span></div>
             ))}
-          </div>
+          </div>}
 
           {stage === "upload" && <div className="heroCard">
             <div className="eyebrow">六年级 · 数学应用题</div>
@@ -302,6 +352,49 @@ export default function Home() {
               <small>支持 JPG、PNG、WebP，最大 10MB</small>
             </label>
             <button className="sampleLink" onClick={useSample}>没有图片？使用内置示例题 →</button>
+            <button className="geometryLink" onClick={() => { setStage("geometry"); setStatus("图形题确定性验证实验台"); }}>体验图形题技术原型 →</button>
+          </div>}
+
+          {stage === "geometry" && <div className="geometryLab">
+            <div className="geometryIntro">
+              <div><div className="eyebrow">图形题 · 技术原型</div><h2>先验证结构，再讨论计算</h2></div>
+              <p>这里使用一条学生确认的辅助线，验证它是否把原区域完整分成两个互不重叠的长方形。像素面积只验证覆盖关系，真实面积由已确认尺寸交给 SymPy 计算。</p>
+            </div>
+            <div className="geometryViews">
+              <article className="diagramCard sourceDiagram">
+                <header><b>原题示意</b><small>事实核对层</small></header>
+                <svg viewBox="0 0 100 100" role="img" aria-label="原始长方形示意图">
+                  <rect x="10" y="10" width="80" height="80" fill="#dceee6" stroke="#18312b" strokeWidth="2"/>
+                  <text x="50" y="7" textAnchor="middle">8 cm</text>
+                  <text x="94" y="52">8 cm</text>
+                </svg>
+                <p>原图只用于确认边界、标注和题意，不从像素比例推断真实长度。</p>
+              </article>
+              <article className="diagramCard teachingDiagram">
+                <header><b>AI 教学黑板</b><small>{geometryResult ? "已生成验证高亮" : "候选辅助线"}</small></header>
+                <svg viewBox="0 0 100 100" role="img" aria-label="SVG 重绘教学图">
+                  {!geometryResult && <rect x="10" y="10" width="80" height="80" fill="#edf5f1" stroke="#18312b" strokeWidth="2"/>}
+                  {geometryResult?.operation.output_regions.map((region, index) => <polygon
+                    key={geometryResult.operation.output_entities[index]}
+                    points={region.points.map((point) => `${point.x * 100},${point.y * 100}`).join(" ")}
+                    className={`verifiedRegion region${index + 1}`}
+                  />)}
+                  <line x1="50" y1="10" x2="50" y2="90" className={geometryResult?.operation.status === "valid" ? "helperLine verified" : "helperLine"}/>
+                  <text x="30" y="54" textAnchor="middle">4 × 8</text>
+                  <text x="70" y="54" textAnchor="middle">4 × 8</text>
+                </svg>
+                <p>{geometryResult?.diagram_patch.caption ?? "黄色虚线是学生提出、尚未验证的辅助线。"}</p>
+              </article>
+            </div>
+            <div className="geometryActions">
+              <button className="primary" onClick={validateGeometryDemo} disabled={processing}>{processing ? "正在验证…" : "确认辅助线并执行验证"}</button>
+              <button className="ghost" onClick={() => setGeometryResult(null)} disabled={!geometryResult}>重置验证</button>
+            </div>
+            {geometryResult && <div className="geometryEvidence">
+              <article><h3>空间检查</h3><ul>{geometryResult.operation.checks.map((check) => <li key={check.check} className={check.passed ? "pass" : "fail"}><span>{check.passed ? "✓" : "×"}</span><div><b>{check.check}</b><small>{check.detail}</small></div></li>)}</ul></article>
+              <article><h3>数学约束</h3>{geometryResult.algebraic_constraints.map((constraint) => <code key={constraint}>{constraint}</code>)}<p>{geometryResult.result_summary}</p></article>
+              <article><h3>验证轨迹</h3>{geometryResult.verification_trace.map((trace) => <div className="traceRow" key={trace.trace_id}><b>{trace.rule_id}</b><span>{trace.status}</span></div>)}</article>
+            </div>}
           </div>}
 
           {stage === "confirm" && <div className="confirmGrid">

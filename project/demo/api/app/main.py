@@ -10,6 +10,8 @@ from PIL import Image, ImageOps
 from .adapters import build_adapters
 from .completion_summary import CompletionSummaryGenerator
 from .gold_cases import GoldCaseRepository
+from .geometry_models import ValidateSplitRequest, ValidateSplitResponse
+from .geometry_rules import GeometryReasoner
 from .llm import LLMRequest, build_llm_registry
 from .models import (
     ConfirmedProblem,
@@ -38,6 +40,7 @@ response_generator = (
 completion_summary_generator = CompletionSummaryGenerator(
     llm_registry.get("tutor_primary") if "tutor_primary" in llm_registry.profiles else None
 )
+geometry_reasoner = GeometryReasoner()
 
 app = FastAPI(title="引导式 AI 家教 Demo API", version="0.1.0")
 app.add_middleware(
@@ -115,6 +118,12 @@ async def confirm_problem(request: ProblemConfirmRequest):
         match_score=score,
         review_reasons=["gold_case_not_found", "math_verification_unknown"],
     )
+
+
+@app.post("/api/geometry/validate-split", response_model=ValidateSplitResponse)
+def validate_geometry_split(request: ValidateSplitRequest):
+    """Validate a student-confirmed helper line against an already confirmed diagram."""
+    return geometry_reasoner.validate_rectangle_partition(request)
 
 
 @app.post("/api/sessions")
