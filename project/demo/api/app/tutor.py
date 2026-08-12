@@ -46,6 +46,12 @@ class TutorEngine:
         self.sessions[session_id] = SessionRecord(state=state, gold_case=gold_case, context=context)
         return state
 
+    def complete_session(self, session_id: str) -> SessionState:
+        state = self.sessions[session_id].state
+        state.phase = "complete"
+        state.current_task = "本题辅导已完成"
+        return state
+
     def context_snapshot(self, session_id: str, include_latest_turn: bool = True) -> dict:
         record = self.sessions[session_id]
         turns = record.turns if include_latest_turn else record.turns[:-1]

@@ -1,8 +1,9 @@
 from app.gold_cases import GoldCaseRepository
 from app.adapters import FunASRAdapter
-from app.models import ConfirmedProblem, ProblemObject
+from app.models import CompletionSummary, ConfirmedProblem, ProblemObject
 from app.models import GeneratedTutorReply
 from app.response_generator import GuidedResponseGenerator
+from app.completion_summary import CompletionSummaryGenerator
 from app.tutor import TutorEngine
 
 
@@ -281,3 +282,50 @@ def test_legacy_no_next_task_text_is_treated_as_solved():
     })
     assert response.state.phase == "reflect"
     assert "无（当前小任务已完成）" not in response.assistant_text
+
+
+def test_student_can_explicitly_complete_session():
+    engine = TutorEngine()
+    problem = ConfirmedProblem(problem_id="manual-finish", confirmed_text="测试题", match_score=0)
+    state = engine.create_session(problem, None)
+    completed = engine.complete_session(state.session_id)
+    assert completed.phase == "complete"
+    assert completed.current_task == "本题辅导已完成"
+
+
+def test_completion_summary_fallback_uses_student_reasoning():
+    engine = TutorEngine()
+    problem = ConfirmedProblem(problem_id="summary", confirmed_text="测试题", match_score=0)
+    state = engine.create_session(problem, None)
+    engine.respond(state.session_id, "先找总量关系", {
+        "intent": "attempt", "verdict": "correct", "alignment": "aligned", "confidence": 0.9,
+        "student_method_summary": "先建立总量关系",
+        "next_subgoal": "继续计算", "reasoning_nodes": [{
+            "node_id": "turn_1", "claim": "两个部分合起来等于总量", "normalized_math": "a+b=total",
+            "evidence": "先找总量关系", "verification_status": "verified", "depends_on": [], "reference_step_id": None,
+        }], "step_candidates": [], "covered_step_ids": [],
+    })
+    summary = CompletionSummaryGenerator._fallback(engine.sessions[state.session_id], "student")
+    assert summary.trigger == "student"
+    assert summary.method == "先建立总量关系"
+    assert summary.steps == ["两个部分合起来等于总量"]
+    assert summary.key_relationship == "a+b=total"
+
+
+def test_completion_summary_guard_removes_answer_and_new_task():
+    engine = TutorEngine()
+    problem = ConfirmedProblem(problem_id="summary-guard", confirmed_text="测试题", match_score=1)
+    state = engine.create_session(problem, {"answer": {"final_value": {"a": 33, "b": 51}}})
+    candidate = CompletionSummary(
+        method="线段图法",
+        key_relationship="两个部分合起来等于总量",
+        steps=["先画两条线段", "算出故事书是33本"],
+        common_pitfall=None,
+        closing_message="下一步你可以试试算出51吗？",
+        trigger="student",
+    )
+    summary = CompletionSummaryGenerator._sanitize(candidate, engine.sessions[state.session_id])
+    assert summary.steps == ["先画两条线段"]
+    assert "下一步" not in summary.closing_message
+    assert "？" not in summary.closing_message
+    assert "51" not in summary.closing_message

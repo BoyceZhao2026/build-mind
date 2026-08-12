@@ -50,6 +50,20 @@ class CreateSessionRequest(BaseModel):
     problem: ConfirmedProblem
 
 
+class CompleteSessionRequest(BaseModel):
+    trigger: Literal["student", "system"] = "student"
+
+
+class CompletionSummary(BaseModel):
+    title: str = "这道题的解题思路"
+    method: str
+    key_relationship: str
+    steps: list[str] = []
+    common_pitfall: str | None = None
+    closing_message: str
+    trigger: Literal["student", "system"]
+
+
 class StudentReasoningNode(BaseModel):
     node_id: str
     claim: str
@@ -74,6 +88,7 @@ class SessionState(BaseModel):
     thought_confidence: float = 0.0
     student_method_summary: str | None = None
     reasoning_nodes: list[StudentReasoningNode] = []
+    completion_summary: CompletionSummary | None = None
     hint_level: int = 1
     turn_count: int = 0
     confirmed_steps: list[str] = []

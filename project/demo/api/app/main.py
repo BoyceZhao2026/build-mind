@@ -8,10 +8,12 @@ from fastapi.responses import Response
 from PIL import Image, ImageOps
 
 from .adapters import build_adapters
+from .completion_summary import CompletionSummaryGenerator
 from .gold_cases import GoldCaseRepository
 from .llm import LLMRequest, build_llm_registry
 from .models import (
     ConfirmedProblem,
+    CompleteSessionRequest,
     CreateSessionRequest,
     ProblemConfirmRequest,
     ProblemObject,
@@ -32,6 +34,9 @@ response_generator = (
     GuidedResponseGenerator(llm_registry.get("tutor_primary"))
     if "tutor_primary" in llm_registry.profiles
     else None
+)
+completion_summary_generator = CompletionSummaryGenerator(
+    llm_registry.get("tutor_primary") if "tutor_primary" in llm_registry.profiles else None
 )
 
 app = FastAPI(title="引导式 AI 家教 Demo API", version="0.1.0")
@@ -245,8 +250,29 @@ async def submit_turn(session_id: str, request: TurnRequest):
                 name for name in candidate.blackboard_focus_objects if name in known_names
             ][:4]
             response.blackboard.relation = candidate.blackboard_relation
+    if response.state.phase == "complete" and response.state.completion_summary is None:
+        summary = await completion_summary_generator.generate(tutor.sessions[session_id], "system")
+        response.state.completion_summary = summary
+        response.business_trace["completion_summary_generated"] = True
     tutor.register_teacher_reply(session_id, response.assistant_text)
     return response
+
+
+@app.post("/api/sessions/{session_id}/complete")
+async def complete_session(session_id: str, request: CompleteSessionRequest):
+    if session_id not in tutor.sessions:
+        raise HTTPException(404, "辅导会话不存在")
+    record = tutor.sessions[session_id]
+    tutor.complete_session(session_id)
+    if record.state.completion_summary is None:
+        record.state.completion_summary = await completion_summary_generator.generate(record, request.trigger)
+    assistant_text = "好的，既然你已经理解了，我们就完成这道题。我把刚才的解题思路整理在总结卡片里。"
+    return {
+        "state": record.state,
+        "summary": record.state.completion_summary,
+        "assistant_text": assistant_text,
+        "trigger": request.trigger,
+    }
 
 
 @app.post("/api/speech/transcribe")

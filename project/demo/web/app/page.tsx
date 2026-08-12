@@ -21,6 +21,11 @@ type Session = {
   current_task: string;
   confirmed_steps: string[];
   turn_count: number;
+  completion_summary?: CompletionSummary | null;
+};
+type CompletionSummary = {
+  title: string; method: string; key_relationship: string; steps: string[];
+  common_pitfall?: string | null; closing_message: string; trigger: "student" | "system";
 };
 type Message = { id: string; role: "student" | "assistant"; text: string; verdict?: string };
 type Blackboard = { current_task: string; focus_objects: string[]; relation?: string; confirmed_steps: string[] };
@@ -44,6 +49,7 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [blackboard, setBlackboard] = useState<Blackboard | null>(null);
   const [businessTrace, setBusinessTrace] = useState<BusinessTrace | null>(null);
+  const [completionSummary, setCompletionSummary] = useState<CompletionSummary | null>(null);
   const [recording, setRecording] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [speaking, setSpeaking] = useState(false);
@@ -190,11 +196,37 @@ export default function Home() {
       setSession(result.state);
       setBlackboard(result.blackboard);
       setBusinessTrace(result.business_trace);
+      setCompletionSummary(result.state.completion_summary ?? null);
       setMessages((current) => [...current, { id: crypto.randomUUID(), role: "assistant", text: result.assistant_text, verdict: result.verdict }]);
       setStatus("轮到你了");
       await speak(result.assistant_text);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "处理失败");
+    } finally {
+      setProcessing(false);
+    }
+  }
+
+  async function completeLesson() {
+    if (!session || session.phase === "complete") return;
+    stopSpeaking();
+    setProcessing(true);
+    setError("");
+    setStatus("正在整理这道题的解题思路…");
+    try {
+      const result = await apiJson<{ state: Session; summary: CompletionSummary; assistant_text: string }>(`/api/sessions/${session.session_id}/complete`, {
+        method: "POST",
+        body: JSON.stringify({ trigger: "student" }),
+      });
+      setSession(result.state);
+      setCompletionSummary(result.summary);
+      setBlackboard((current) => current ? { ...current, current_task: "本题辅导已完成" } : current);
+      setMessages((current) => [...current, { id: crypto.randomUUID(), role: "assistant", text: result.assistant_text }]);
+      setStatus("本题已完成，解题思路已整理");
+      await speak(result.assistant_text);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "完成本题失败");
+      setStatus("暂时无法生成总结，请重试");
     } finally {
       setProcessing(false);
     }
@@ -239,7 +271,7 @@ export default function Home() {
     stopSpeaking();
     recorderRef.current?.state === "recording" && recorderRef.current.stop();
     setStage("upload"); setImageUrl(""); setRecognizedText(""); setProblem(null);
-    setSession(null); setMessages([]); setBlackboard(null); setBusinessTrace(null); setError("");
+    setSession(null); setMessages([]); setBlackboard(null); setBusinessTrace(null); setCompletionSummary(null); setError("");
     setStatus("等待上传题目");
   }
 
@@ -319,6 +351,15 @@ export default function Home() {
                 <p onClick={() => message.role === "assistant" && speak(message.text)}>{message.text}</p>
                 {message.role === "assistant" && <small>点击文字可重新朗读</small>}
               </div>)}
+              {completionSummary && <article className="summaryCard">
+                <div className="summaryHeading"><span>思路总结</span><small>{completionSummary.trigger === "student" ? "你主动完成" : "理解验证完成"}</small></div>
+                <h2>{completionSummary.title}</h2>
+                <section><label>使用的方法</label><p>{completionSummary.method}</p></section>
+                <section><label>关键数量关系</label><strong>{completionSummary.key_relationship}</strong></section>
+                <section><label>思路步骤</label><ol>{completionSummary.steps.map((step, index) => <li key={`${index}-${step}`}>{step}</li>)}</ol></section>
+                {completionSummary.common_pitfall && <section className="pitfall"><label>下次注意</label><p>{completionSummary.common_pitfall}</p></section>}
+                <footer>{completionSummary.closing_message}</footer>
+              </article>}
               {processing && <div className="thinking"><i/><i/><i/> 正在认真理解你的思路</div>}
               <div ref={bottomRef}/>
             </div>
@@ -328,6 +369,7 @@ export default function Home() {
               <button className={`micButton ${recording ? "recording" : ""}`} onClick={recording ? stopRecording : startRecording} disabled={processing || speaking || session?.phase === "complete"}>
                 <span>{recording ? "■" : "●"}</span>{recording ? "我说完了" : "点击说话"}
               </button>
+              {session?.phase !== "complete" && <button className="finishButton" onClick={completeLesson} disabled={processing || speaking || recording}>✓ 我已理解，完成本题</button>}
               <div className="debugInput"><input disabled={session?.phase === "complete"} value={debugText} onChange={(e) => setDebugText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && sendTurn(debugText)} placeholder="调试：也可以输入文字"/><button disabled={session?.phase === "complete"} onClick={() => sendTurn(debugText)}>发送</button></div>
               <small>{status}</small>
             </div>
