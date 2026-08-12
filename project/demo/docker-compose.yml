@@ -1,0 +1,18 @@
+services:
+  api:
+    build: ./api
+    env_file: ./api/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../../evaluation:/evaluation:ro
+    environment:
+      GOLD_CASES_PATH: /evaluation/cases/all_cases.yaml
+  web:
+    build: ./web
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+    depends_on:
+      - api
