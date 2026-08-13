@@ -14,6 +14,7 @@ type Problem = {
   objects: { object_id: string; name: string; value: unknown; unit: string | null; role: string }[];
   relationships: { relationship_id: string; natural_language: string }[];
   review_reasons: string[];
+  diagram_graph?: DiagramGraph | null;
 };
 type Session = {
   session_id: string;
@@ -36,6 +37,7 @@ type BusinessTrace = {
   history_messages_submitted?: number; reference_match?: { note?: string };
   solution_status?: "in_progress" | "solved" | "understanding_verified";
   guard?: { decision?: string; violations?: string[]; leakage_safe?: boolean };
+  math_tool_checks?: { node_id: string; status: string; basis?: string; reason?: string }[];
 };
 type GeometryPoint = { x: number; y: number };
 type GeometryResult = {
@@ -50,6 +52,23 @@ type GeometryResult = {
   result_summary?: string | null;
   verification_trace: { trace_id: string; rule_id: string; status: string; produced_constraints: string[] }[];
   diagram_patch: { caption: string; focus_entities: string[] };
+};
+type DebugSolution = {
+  available: boolean;
+  source: "matched_gold_case" | "generated_and_verified" | "generated_unverified" | "fallback" | "not_generated";
+  case_id?: string | null;
+  solution_paths: {
+    path_id: string; method: string; age_appropriate?: boolean | null;
+    steps: { step_id: string; goal?: string | null; operation?: string | null; expression_after?: string | null; result_value?: unknown; unit?: string | null }[];
+  }[];
+  answer?: { final_value?: unknown; unit?: string; validation_expression?: string } | null;
+  note: string;
+};
+type DiagramGraph = {
+  schema_version: string; diagram_id: string; diagram_type: string; confidence: number; status: "draft" | "confirmed";
+  entities: { entity_id: string; type: string; label?: string | null; geometry: Record<string, unknown>; confidence: number; status: string }[];
+  relations: { relation_id: string; predicate: string; subjects: string[]; value?: unknown; source: string; confidence: number; status: string }[];
+  uncertainties: { uncertainty_id: string; description: string; affected_entity_ids: string[]; requires_confirmation: boolean }[];
 };
 
 const SAMPLE_TEXT = "甲、乙两人同时从相距360米的两地相向而行。甲每分钟走50米，乙每分钟走70米。几分钟后两人相遇？";
@@ -71,6 +90,10 @@ export default function Home() {
   const [error, setError] = useState("");
   const [debugText, setDebugText] = useState("");
   const [geometryResult, setGeometryResult] = useState<GeometryResult | null>(null);
+  const [showOriginalImage, setShowOriginalImage] = useState(false);
+  const [debugSolution, setDebugSolution] = useState<DebugSolution | null>(null);
+  const [diagramGraph, setDiagramGraph] = useState<DiagramGraph | null>(null);
+  const [diagramConfirmed, setDiagramConfirmed] = useState(false);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -86,11 +109,14 @@ export default function Home() {
     setError("");
     setProcessing(true);
     setStatus("正在识别题目…");
+    if (imageUrl) URL.revokeObjectURL(imageUrl);
     const localUrl = URL.createObjectURL(file);
     setImageUrl(localUrl);
     try {
-      const result = await upload<{ normalized_display_text: string }>("/api/problems/recognize", "image", file, file.name);
+      const result = await upload<{ normalized_display_text: string; diagram_graph?: DiagramGraph | null }>("/api/problems/recognize", "image", file, file.name);
       setRecognizedText(result.normalized_display_text);
+      setDiagramGraph(result.diagram_graph ?? null);
+      setDiagramConfirmed(!result.diagram_graph);
       setStage("confirm");
       setStatus("请对照图片确认识别文字");
     } catch (cause) {
@@ -104,6 +130,8 @@ export default function Home() {
   async function useSample() {
     setRecognizedText(SAMPLE_TEXT);
     setImageUrl("");
+    setDiagramGraph(null);
+    setDiagramConfirmed(true);
     setStage("confirm");
     setStatus("示例题已载入，请确认题目");
   }
@@ -115,7 +143,7 @@ export default function Home() {
     try {
       const confirmed = await apiJson<Problem>("/api/problems/confirm", {
         method: "POST",
-        body: JSON.stringify({ confirmed_text: recognizedText }),
+        body: JSON.stringify({ confirmed_text: recognizedText, diagram_graph: diagramGraph, diagram_confirmed: diagramConfirmed }),
       });
       setProblem(confirmed);
       setStage("ready");
@@ -136,6 +164,11 @@ export default function Home() {
         body: JSON.stringify({ problem }),
       });
       setSession(created);
+      try {
+        setDebugSolution(await apiJson<DebugSolution>(`/api/sessions/${created.session_id}/debug-solution`));
+      } catch {
+        setDebugSolution({ available: false, source: "not_generated", solution_paths: [], note: "内部解法调试接口暂时不可用。" });
+      }
       setBlackboard({ current_task: created.current_task, focus_objects: problem.objects.slice(0, 4).map((o) => o.name), confirmed_steps: [] });
       const greeting = `你好，我们一起想这道题。我不会直接告诉你答案。先看第一个小任务：${created.current_task}。你目前有什么想法？`;
       setMessages([{ id: crypto.randomUUID(), role: "assistant", text: greeting }]);
@@ -319,9 +352,14 @@ export default function Home() {
   function reset() {
     stopSpeaking();
     recorderRef.current?.state === "recording" && recorderRef.current.stop();
+    if (imageUrl) URL.revokeObjectURL(imageUrl);
     setStage("upload"); setImageUrl(""); setRecognizedText(""); setProblem(null);
     setSession(null); setMessages([]); setBlackboard(null); setBusinessTrace(null); setCompletionSummary(null); setError("");
     setGeometryResult(null);
+    setShowOriginalImage(false);
+    setDebugSolution(null);
+    setDiagramGraph(null);
+    setDiagramConfirmed(false);
     setStatus("等待上传题目");
   }
 
@@ -405,8 +443,17 @@ export default function Home() {
             <div className="panel editPanel">
               <div className="panelTitle"><span>识别结果</span><small>可以直接修改</small></div>
               <textarea value={recognizedText} onChange={(e) => setRecognizedText(e.target.value)} aria-label="识别出的题目"/>
+              {diagramGraph && <div className="diagramConfirmation">
+                <div className="diagramConfirmTitle"><b>识别到题目图形</b><span>{diagramGraph.diagram_type} · {Math.round(diagramGraph.confidence * 100)}%</span></div>
+                <div className="diagramEntityList">
+                  {diagramGraph.entities.slice(0, 12).map((entity) => <span key={entity.entity_id}>{entity.label || entity.entity_id}<small>{entity.type}</small><code>{JSON.stringify(entity.geometry)}</code></span>)}
+                </div>
+                {diagramGraph.relations.length > 0 && <ul>{diagramGraph.relations.slice(0, 8).map((relation) => <li key={relation.relation_id}><code>{relation.predicate}({relation.subjects.join(", ")})</code><small>{relation.source} · {Math.round(relation.confidence * 100)}%</small></li>)}</ul>}
+                {diagramGraph.uncertainties.map((item) => <div className="diagramUncertainty" key={item.uncertainty_id}>需要核对：{item.description}</div>)}
+                <label className="diagramConfirmCheck"><input type="checkbox" checked={diagramConfirmed} onChange={(event) => setDiagramConfirmed(event.target.checked)}/><span>我已对照原图确认这些图形对象和关键关系</span></label>
+              </div>}
               <div className="notice">确认后才会分析题目；AI 不会在识图阶段补条件或解题。</div>
-              <button className="primary" onClick={confirmProblem} disabled={processing}>{processing ? "正在确认…" : "题目无误，继续"}</button>
+              <button className="primary" onClick={confirmProblem} disabled={processing || (!!diagramGraph && !diagramConfirmed)}>{processing ? "正在确认…" : diagramGraph && !diagramConfirmed ? "请先确认图形" : "题目无误，继续"}</button>
             </div>
           </div>}
 
@@ -429,6 +476,10 @@ export default function Home() {
         <section className="classroom">
           <aside className="problemRail">
             <div className="railHeader">本题</div>
+            {imageUrl && <button className="railProblemImage" onClick={() => setShowOriginalImage(true)} aria-label="放大查看原题图片">
+              <img src={imageUrl} alt="学生上传的原题和图形"/>
+              <span>查看原题图</span>
+            </button>}
             <p>{problem?.confirmed_text}</p>
             <div className="objectList">
               {problem?.objects.slice(0, 6).map((object) => <div key={object.object_id}><span>{object.name}</span><b>{object.value == null ? "?" : `${object.value}${object.unit ?? ""}`}</b></div>)}
@@ -492,13 +543,38 @@ export default function Home() {
                   </li>)}</ol> : <p className="muted">尚无经过提取的数学主张</p>}
                 </section>
                 {businessTrace.remaining_gap && <section><label>当前缺口</label><p>{businessTrace.remaining_gap}</p></section>}
+                {businessTrace.math_tool_checks?.length ? <section><label>SymPy 数学验证</label>{businessTrace.math_tool_checks.map((check) => <p key={check.node_id}>{check.node_id} · {check.status} · {check.basis || check.reason}</p>)}</section> : null}
                 <section><label>下一教学目标</label><p>{businessTrace.next_subgoal}</p></section>
                 <section><label>安全审核</label><p>{businessTrace.guard?.decision ?? "—"} · {businessTrace.guard?.leakage_safe ? "未泄露答案" : "需要拦截"}</p></section>
                 <small className="traceNote">展示结构化业务决策证据，不展示模型内部推理文本。{businessTrace.reference_match?.note}</small>
               </>}
             </details>
+            <details className="demoSolutionPanel">
+              <summary>Demo 调试：内部解法与答案</summary>
+              <div className="demoWarning">仅供产品测试，不属于学生教学界面</div>
+              {!debugSolution?.available ? <p className="muted">{debugSolution?.note ?? "正在加载内部备课结果…"}</p> : <>
+                <p className="debugSource">来源：{debugSolution.source} · {debugSolution.case_id}</p>
+                {debugSolution.solution_paths.map((path) => <section key={path.path_id} className="debugPath">
+                  <label>{path.method}</label>
+                  <ol>{path.steps.map((step) => <li key={step.step_id}>
+                    <b>{step.goal}</b>
+                    <span>{step.operation}</span>
+                    {step.expression_after && <code>{step.expression_after}</code>}
+                  </li>)}</ol>
+                </section>)}
+                <section className="debugAnswer"><label>内部最终答案</label><strong>{JSON.stringify(debugSolution.answer?.final_value)} {debugSolution.answer?.unit}</strong>{debugSolution.answer?.validation_expression && <code>{debugSolution.answer.validation_expression}</code>}</section>
+                <small className="traceNote">{debugSolution.note}</small>
+              </>}
+            </details>
           </aside>
           {error && <div className="callError">{error}</div>}
+          {showOriginalImage && imageUrl && <div className="originalImageModal" role="dialog" aria-modal="true" aria-label="原题图片">
+            <button className="modalBackdrop" onClick={() => setShowOriginalImage(false)} aria-label="关闭原题图片"/>
+            <div className="originalImageDialog">
+              <header><div><b>原题图片</b><small>用于核对题干、标注和图形</small></div><button onClick={() => setShowOriginalImage(false)} aria-label="关闭">×</button></header>
+              <img src={imageUrl} alt="放大后的原题和图形"/>
+            </div>
+          </div>}
         </section>
       )}
     </main>

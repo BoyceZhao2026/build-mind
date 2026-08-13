@@ -12,10 +12,14 @@ class ImageRecognitionResult(BaseModel):
     confidence: float | None = None
     provider: str
     model: str
+    diagram_graph: dict[str, Any] | None = None
+    debug_image_path: str | None = None
 
 
 class ProblemConfirmRequest(BaseModel):
     confirmed_text: str = Field(min_length=4)
+    diagram_graph: dict[str, Any] | None = None
+    diagram_confirmed: bool = False
 
 
 class ProblemObject(BaseModel):
@@ -44,6 +48,7 @@ class ConfirmedProblem(BaseModel):
     objects: list[ProblemObject] = []
     relationships: list[ProblemRelationship] = []
     review_reasons: list[str] = []
+    diagram_graph: dict[str, Any] | None = None
 
 
 class CreateSessionRequest(BaseModel):

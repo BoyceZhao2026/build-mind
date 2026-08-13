@@ -1,5 +1,6 @@
 import io
 from pathlib import Path
+import time
 from uuid import uuid4
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
@@ -11,6 +12,7 @@ from .adapters import build_adapters
 from .completion_summary import CompletionSummaryGenerator
 from .gold_cases import GoldCaseRepository
 from .geometry_models import ValidateSplitRequest, ValidateSplitResponse
+from .geometry_models import DiagramGraphDraft
 from .geometry_rules import GeometryReasoner
 from .llm import LLMRequest, build_llm_registry
 from .models import (
@@ -23,7 +25,9 @@ from .models import (
     TurnRequest,
 )
 from .response_generator import GuidedResponseGenerator
+from .math_verifier import SympyMathVerifier
 from .settings import configure_process_proxy, get_settings
+from .teacher_preparation import TeacherPreparationGenerator
 from .tutor import TutorEngine
 
 settings = get_settings()
@@ -41,6 +45,11 @@ completion_summary_generator = CompletionSummaryGenerator(
     llm_registry.get("tutor_primary") if "tutor_primary" in llm_registry.profiles else None
 )
 geometry_reasoner = GeometryReasoner()
+math_verifier = SympyMathVerifier()
+teacher_preparation_generator = TeacherPreparationGenerator(
+    llm_registry.get("tutor_primary") if "tutor_primary" in llm_registry.profiles else None,
+    math_verifier,
+)
 
 app = FastAPI(title="引导式 AI 家教 Demo API", version="0.1.0")
 app.add_middleware(
@@ -93,11 +102,49 @@ async def recognize_problem(image: UploadFile = File(...)):
         raise
     except Exception as exc:
         raise HTTPException(400, "图片无法解码") from exc
-    return await vision.recognize(payload, content_type)
+    debug_image_path = _save_debug_upload(payload, content_type)
+    result = await vision.recognize(payload, content_type)
+    result.debug_image_path = str(debug_image_path) if debug_image_path else None
+    return result
+
+
+def _save_debug_upload(payload: bytes, content_type: str) -> Path | None:
+    """Keep recent Demo uploads locally so recognition failures can be reproduced."""
+    if not settings.save_uploaded_images:
+        return None
+    upload_dir = settings.uploaded_images_dir
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    cutoff = time.time() - max(settings.uploaded_image_retention_hours, 1) * 3600
+    for existing in upload_dir.iterdir():
+        try:
+            if existing.is_file() and existing.stat().st_mtime < cutoff:
+                existing.unlink()
+        except OSError:
+            continue
+    suffix = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}[content_type]
+    target = upload_dir / f"{int(time.time())}_{uuid4().hex}{suffix}"
+    target.write_bytes(payload)
+    return target
 
 
 @app.post("/api/problems/confirm", response_model=ConfirmedProblem)
 async def confirm_problem(request: ProblemConfirmRequest):
+    diagram_graph = None
+    review_reasons = []
+    if request.diagram_graph is not None:
+        try:
+            graph = DiagramGraphDraft.model_validate(request.diagram_graph)
+            if request.diagram_confirmed:
+                graph.status = "confirmed"
+                for entity in graph.entities:
+                    entity.status = "confirmed"
+                for relation in graph.relations:
+                    relation.status = "confirmed"
+            else:
+                review_reasons.append("diagram_not_confirmed")
+            diagram_graph = graph.model_dump()
+        except Exception as exc:
+            raise HTTPException(422, f"图形结构校验失败：{exc}") from exc
     case, score = repository.best_match(request.confirmed_text)
     if case:
         objects = [ProblemObject(**obj) for obj in case.get("objects", [])]
@@ -111,12 +158,15 @@ async def confirm_problem(request: ProblemConfirmRequest):
             match_score=score,
             objects=objects,
             relationships=relationships,
+            diagram_graph=diagram_graph,
+            review_reasons=review_reasons,
         )
     return ConfirmedProblem(
         problem_id=str(uuid4()),
         confirmed_text=request.confirmed_text,
         match_score=score,
-        review_reasons=["gold_case_not_found", "math_verification_unknown"],
+        review_reasons=["gold_case_not_found", "math_verification_unknown", *review_reasons],
+        diagram_graph=diagram_graph,
     )
 
 
@@ -127,12 +177,26 @@ def validate_geometry_split(request: ValidateSplitRequest):
 
 
 @app.post("/api/sessions")
-def create_session(request: CreateSessionRequest):
+async def create_session(request: CreateSessionRequest):
     case = next(
         (item for item in repository.cases if item.get("case_id") == request.problem.matched_case_id),
         None,
     )
-    return tutor.create_session(request.problem, case)
+    preparation = None
+    runtime_case = case
+    if case is None:
+        package = await teacher_preparation_generator.generate(request.problem)
+        preparation = package.model_dump()
+        if package.status == "ready" and package.source == "generated_and_verified":
+            runtime_case = package.to_runtime_case(request.problem)
+    return tutor.create_session(request.problem, runtime_case, preparation=preparation)
+
+
+@app.get("/api/sessions/{session_id}/debug-solution")
+def get_debug_solution(session_id: str):
+    if session_id not in tutor.sessions:
+        raise HTTPException(404, "辅导会话不存在")
+    return tutor.debug_solution(session_id)
 
 
 @app.post("/api/sessions/{session_id}/turn")
@@ -221,6 +285,22 @@ async def submit_turn(session_id: str, request: TurnRequest):
             model_analysis = result.parsed
             if isinstance(model_analysis, dict):
                 model_analysis["history_messages_submitted"] = len(conversation_context.get("conversation_history", []))
+                runtime_case = record.gold_case or {}
+                variables = runtime_case.get("variables", [])
+                constraints = runtime_case.get("constraints", [])
+                math_checks = []
+                if variables and constraints:
+                    for node in model_analysis.get("reasoning_nodes", []):
+                        normalized = node.get("normalized_math") if isinstance(node, dict) else None
+                        if isinstance(normalized, str) and "=" in normalized:
+                            check = math_verifier.verify_student_equation(normalized, variables, constraints)
+                            math_checks.append({"node_id": node.get("node_id"), **check})
+                            if check.get("status") == "verified":
+                                node["verification_status"] = "verified"
+                            elif check.get("status") == "rejected":
+                                node["verification_status"] = "rejected"
+                                model_analysis["verdict"] = "incorrect"
+                model_analysis["math_tool_checks"] = math_checks
         except Exception:
             model_analysis = None
     response = tutor.respond(session_id, request.text.strip(), model_analysis=model_analysis)

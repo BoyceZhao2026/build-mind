@@ -2,6 +2,7 @@ import pytest
 from pydantic import ValidationError
 
 from app.geometry_models import (
+    DiagramGraphDraft,
     FactStatus,
     GeometryFact,
     Point2D,
@@ -98,3 +99,60 @@ def test_geometry_fact_rejects_non_standard_predicate():
             problem_version=1,
             diagram_version=1,
         )
+
+
+def test_diagram_graph_draft_accepts_controlled_entities_and_relations():
+    graph = DiagramGraphDraft.model_validate({
+        "diagram_id": "diagram-1",
+        "diagram_type": "geometry",
+        "confidence": 0.91,
+        "entities": [
+            {"entity_id": "region_1", "type": "region", "geometry": {"points": [[0.1, 0.1], [0.9, 0.1], [0.9, 0.9]]}, "confidence": 0.9},
+            {"entity_id": "seg_1", "type": "segment", "geometry": {"start": [0.1, 0.1], "end": [0.9, 0.1]}, "confidence": 0.92},
+        ],
+        "relations": [{
+            "relation_id": "rel_1", "predicate": "boundary_edge", "subjects": ["region_1", "seg_1"],
+            "source": "model_inferred", "confidence": 0.8, "status": "needs_confirmation",
+        }],
+        "uncertainties": [{"uncertainty_id": "u1", "description": "边界绑定需要确认", "affected_entity_ids": ["seg_1"]}],
+    })
+    assert graph.status == "draft"
+    assert graph.relations[0].predicate == "boundary_edge"
+
+
+def test_diagram_graph_draft_normalizes_scalar_relation_value_from_vision_model():
+    graph = DiagramGraphDraft.model_validate({
+        "diagram_id": "diagram_scalar_value",
+        "diagram_type": "geometry",
+        "relations": [{
+            "relation_id": "relation_grid",
+            "predicate": "composed_of",
+            "subjects": ["region_1"],
+            "value": "grid",
+            "source": "model_inferred",
+            "confidence": 0.72,
+            "status": "needs_confirmation",
+        }],
+    })
+
+    assert graph.relations[0].value == {"raw": "grid"}
+
+
+def test_diagram_graph_draft_normalizes_grid_diagram_type():
+    graph = DiagramGraphDraft.model_validate({
+        "diagram_id": "diagram_grid",
+        "diagram_type": "grid",
+    })
+
+    assert graph.diagram_type == "geometry"
+    assert graph.source_diagram_type == "grid"
+
+
+def test_diagram_graph_draft_degrades_unknown_diagram_type_to_other():
+    graph = DiagramGraphDraft.model_validate({
+        "diagram_id": "diagram_unknown",
+        "diagram_type": "unexpected_model_label",
+    })
+
+    assert graph.diagram_type == "other"
+    assert graph.source_diagram_type == "unexpected_model_label"

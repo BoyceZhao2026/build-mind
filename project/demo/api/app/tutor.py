@@ -17,6 +17,7 @@ from .models import (
 class SessionRecord:
     state: SessionState
     gold_case: dict | None
+    preparation: dict | None = None
     turns: list[TutorTurnResponse] = field(default_factory=list)
     context: TutorContext = field(default_factory=TutorContext)
 
@@ -25,7 +26,7 @@ class TutorEngine:
     def __init__(self):
         self.sessions: dict[str, SessionRecord] = {}
 
-    def create_session(self, problem: ConfirmedProblem, gold_case: dict | None) -> SessionState:
+    def create_session(self, problem: ConfirmedProblem, gold_case: dict | None, preparation: dict | None = None) -> SessionState:
         session_id = str(uuid4())
         task = "先说说你准备怎样分析题目中的数量关系"
         state = SessionState(
@@ -43,7 +44,9 @@ class TutorEngine:
             unresolved_questions=[opening_question],
             recent_teacher_questions=[opening_question],
         )
-        self.sessions[session_id] = SessionRecord(state=state, gold_case=gold_case, context=context)
+        self.sessions[session_id] = SessionRecord(
+            state=state, gold_case=gold_case, preparation=preparation, context=context,
+        )
         return state
 
     def complete_session(self, session_id: str) -> SessionState:
@@ -51,6 +54,72 @@ class TutorEngine:
         state.phase = "complete"
         state.current_task = "本题辅导已完成"
         return state
+
+    def debug_solution(self, session_id: str) -> dict:
+        """Expose the hidden reference package only to the explicitly labelled Demo UI."""
+        record = self.sessions[session_id]
+        gold_case = record.gold_case or {}
+        preparation = record.preparation or {}
+        paths = []
+        for path in self._paths_from_case(record.gold_case):
+            paths.append({
+                "path_id": path.get("path_id"),
+                "method": path.get("method"),
+                "age_appropriate": path.get("age_appropriate"),
+                "steps": [{
+                    "step_id": step.get("step_id"),
+                    "goal": step.get("goal"),
+                    "operation": step.get("operation"),
+                    "expression_after": step.get("expression_after"),
+                    "result_value": step.get("result_value"),
+                    "unit": step.get("unit"),
+                    "verification": step.get("verification"),
+                } for step in path.get("steps", [])],
+            })
+        if not paths:
+            for index, path in enumerate(preparation.get("candidate_solutions", []), start=1):
+                paths.append({
+                    "path_id": f"preparation_path_{index}",
+                    "method": path.get("method"),
+                    "age_appropriate": path.get("age_appropriate"),
+                    "steps": [{
+                        "step_id": f"preparation_{index}_{step_index}",
+                        "goal": step.get("goal"),
+                        "operation": step.get("operation"),
+                        "expression_after": step.get("expression"),
+                    } for step_index, step in enumerate(path.get("steps", []), start=1)],
+                })
+        answer = gold_case.get("answer")
+        if answer is None and preparation.get("verified_answer"):
+            answer = {
+                "final_value": preparation["verified_answer"],
+                "unit": "由变量含义和题目单位确定",
+                "validation_expression": "; ".join(
+                    f"{item.get('left')}={item.get('right')}"
+                    for item in preparation.get("constraints", [])
+                ),
+                "internal_only": True,
+            }
+        is_dynamic_preparation = bool(
+            preparation or gold_case.get("preparation_source")
+        )
+        return {
+            "available": bool(paths or answer),
+            "source": gold_case.get("preparation_source") or ("matched_gold_case" if gold_case else preparation.get("source", "not_generated")),
+            "case_id": gold_case.get("case_id"),
+            "solution_paths": paths,
+            "answer": answer,
+            "note": (
+                f"动态备课状态：{preparation.get('status', 'ready')}。"
+                f"{preparation.get('error') or ('答案已由 SymPy 验证。' if answer else '尚无经过验证的解法。')}"
+                if is_dynamic_preparation else
+                "这是匹配金标准后加载的内部参考，不代表学生必须按照该顺序作答。"
+                if gold_case else
+                f"动态备课状态：{preparation.get('status', 'not_generated')}。"
+                f"{preparation.get('error') or ('答案已由 SymPy 验证。' if preparation.get('verified_answer') else '尚无经过验证的解法。')}"
+            ),
+            "preparation": preparation,
+        }
 
     def context_snapshot(self, session_id: str, include_latest_turn: bool = True) -> dict:
         record = self.sessions[session_id]
@@ -329,6 +398,7 @@ class TutorEngine:
             "solution_status": analysis.get("solution_status", "in_progress"),
             "completion_evidence": analysis.get("completion_evidence"),
             "history_messages_submitted": analysis.get("history_messages_submitted", 0),
+            "math_tool_checks": analysis.get("math_tool_checks", []),
         }
 
     @staticmethod

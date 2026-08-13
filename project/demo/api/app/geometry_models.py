@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class Point2D(BaseModel):
@@ -150,6 +150,92 @@ class DiagramPatch(BaseModel):
     add_helper_entities: list[dict] = Field(default_factory=list)
     add_regions: list[dict] = Field(default_factory=list)
     caption: str
+
+
+class DiagramEntityDraft(BaseModel):
+    entity_id: str
+    type: Literal["point", "segment", "circle", "arc", "polygon", "region", "text_label", "measurement_label", "symbol_marker"]
+    label: str | None = None
+    geometry: dict = Field(default_factory=dict)
+    confidence: float = Field(default=0.5, ge=0, le=1)
+    status: Literal["candidate", "needs_confirmation", "confirmed"] = "candidate"
+
+
+class DiagramRelationDraft(BaseModel):
+    relation_id: str
+    predicate: StandardPredicate
+    subjects: list[str] = Field(min_length=1)
+    value: dict | None = None
+    source: Literal["problem_text", "explicit_diagram_mark", "model_inferred"]
+    confidence: float = Field(default=0.5, ge=0, le=1)
+    status: Literal["candidate", "needs_confirmation", "confirmed"] = "candidate"
+
+    @field_validator("value", mode="before")
+    @classmethod
+    def normalize_model_value(cls, value: Any) -> dict | None:
+        """Tolerate common multimodal-model scalar output at the API boundary."""
+        if value is None or isinstance(value, dict):
+            return value
+        if isinstance(value, (str, int, float, bool)):
+            return {"raw": value}
+        if isinstance(value, list):
+            return {"items": value}
+        raise ValueError("关系 value 必须是对象、标量、数组或 null")
+
+
+class DiagramUncertainty(BaseModel):
+    uncertainty_id: str
+    description: str
+    affected_entity_ids: list[str] = Field(default_factory=list)
+    candidates: list[str] = Field(default_factory=list)
+    requires_confirmation: bool = True
+
+
+class DiagramGraphDraft(BaseModel):
+    schema_version: str = "1.0"
+    diagram_id: str
+    diagram_type: Literal["geometry", "segment_model", "motion", "statistics", "other"]
+    source_diagram_type: str | None = None
+    entities: list[DiagramEntityDraft] = Field(default_factory=list, max_length=100)
+    relations: list[DiagramRelationDraft] = Field(default_factory=list, max_length=100)
+    uncertainties: list[DiagramUncertainty] = Field(default_factory=list, max_length=30)
+    confidence: float = Field(default=0.5, ge=0, le=1)
+    status: Literal["draft", "confirmed"] = "draft"
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_diagram_type(cls, value):
+        if not isinstance(value, dict):
+            return value
+        data = dict(value)
+        raw_type = data.get("diagram_type", "other")
+        if not isinstance(raw_type, str):
+            data["source_diagram_type"] = str(raw_type)
+            data["diagram_type"] = "other"
+            return data
+        normalized = raw_type.strip().lower().replace("-", "_").replace(" ", "_")
+        aliases = {
+            "grid": "geometry",
+            "shape": "geometry",
+            "geometric": "geometry",
+            "geometry_diagram": "geometry",
+            "composite_shape": "geometry",
+            "area_diagram": "geometry",
+            "line_segment": "segment_model",
+            "bar_model": "segment_model",
+            "tape_diagram": "segment_model",
+            "travel": "motion",
+            "route": "motion",
+            "chart": "statistics",
+            "graph": "statistics",
+            "table": "statistics",
+        }
+        allowed = {"geometry", "segment_model", "motion", "statistics", "other"}
+        canonical = aliases.get(normalized, normalized if normalized in allowed else "other")
+        if canonical != normalized:
+            data["source_diagram_type"] = raw_type
+        data["diagram_type"] = canonical
+        return data
 
 
 class ValidateSplitRequest(BaseModel):

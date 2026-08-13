@@ -55,7 +55,20 @@ class QwenVisionAdapter(VisionAdapter):
                         {"type": "text", "text": (
                             "忠实转写图片中的一道中文数学应用题，不要解题，不要补条件，不要改数字。"
                             "输出JSON：raw_text、normalized_display_text、uncertain_spans字符串数组、"
-                            "possible_multiple_problems布尔值、possible_truncation布尔值、confidence数值。"
+                            "possible_multiple_problems布尔值、possible_truncation布尔值、confidence数值、diagram_graph。"
+                            "如果题目不依赖图形，diagram_graph为null。否则diagram_graph包含：schema_version='1.0'、"
+                            "diagram_id、diagram_type(只能是geometry/segment_model/motion/statistics/other；方格图也必须写geometry，不能写grid)、confidence、status='draft'、"
+                            "entities数组、relations数组、uncertainties数组。entities每项包含entity_id、type(point/segment/circle/arc/polygon/region/text_label/measurement_label/symbol_marker)、"
+                            "label、geometry(使用0到1归一化坐标)、confidence、status(candidate/needs_confirmation)。"
+                            "relations每项包含relation_id、predicate、subjects、value、source(problem_text/explicit_diagram_mark/model_inferred)、confidence、status；"
+                            "value必须是JSON对象或null，例如{\"pattern\":\"grid\"}，不能直接返回字符串。"
+                            "如果是网格面积题：网格region的geometry必须包含grid:{columns整数,rows整数,cell_area:{number数值,unit字符串}}；"
+                            "目标polygon的geometry必须包含coordinate_space='grid'和grid_vertices，每个顶点必须是对应网格交点的[x,y]坐标；"
+                            "不要只返回图片归一化顶点。网格线数量和顶点位置无法确定时加入uncertainties，禁止猜测。"
+                            "predicate只能使用is_triangle/is_rectangle/is_square/is_parallelogram/is_trapezoid/is_circle/is_semicircle/is_sector/"
+                            "endpoint_of/boundary_edge/inside/contains/intersects/disjoint/overlaps/composed_of/parallel/perpendicular/equal_length/collinear/tangent/adjacent/shares_boundary/"
+                            "length/angle_measure/radius/diameter/perimeter/area/disjoint_union/region_difference/equal_area/split_into/rearranged_to。"
+                            "只根据外观看出的平行、垂直、等长必须标记model_inferred和needs_confirmation，不能当作已确认事实。"
                         )},
                     ],
                 }],

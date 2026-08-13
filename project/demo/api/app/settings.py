@@ -19,10 +19,20 @@ class Settings(BaseSettings):
     cosyvoice_model: str = "cosyvoice-v3-flash"
     cosyvoice_voice: str = "longanyang"
     gold_cases_path: str = "../../../evaluation/cases/all_cases.yaml"
+    save_uploaded_images: bool = True
+    uploaded_images_path: str = "../tmp/uploads"
+    uploaded_image_retention_hours: int = 24
 
     @property
     def gold_path(self) -> Path:
         path = Path(self.gold_cases_path)
+        if path.is_absolute():
+            return path
+        return (Path(__file__).resolve().parent.parent / path).resolve()
+
+    @property
+    def uploaded_images_dir(self) -> Path:
+        path = Path(self.uploaded_images_path)
         if path.is_absolute():
             return path
         return (Path(__file__).resolve().parent.parent / path).resolve()

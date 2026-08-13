@@ -329,3 +329,37 @@ def test_completion_summary_guard_removes_answer_and_new_task():
     assert "下一步" not in summary.closing_message
     assert "？" not in summary.closing_message
     assert "51" not in summary.closing_message
+
+
+def test_debug_solution_exposes_reference_only_for_demo_inspection():
+    engine = TutorEngine()
+    problem = ConfirmedProblem(problem_id="debug-solution", confirmed_text="测试题", match_score=1)
+    state = engine.create_session(problem, {
+        "case_id": "case-debug",
+        "answer": {"final_value": 12, "unit": "平方厘米"},
+        "solution_paths": [{
+            "path_id": "path-1",
+            "method": "分割法",
+            "steps": [{"step_id": "s1", "goal": "分割区域", "operation": "分成两个长方形"}],
+        }],
+    })
+    debug = engine.debug_solution(state.session_id)
+    assert debug["available"] is True
+    assert debug["source"] == "matched_gold_case"
+    assert debug["answer"]["final_value"] == 12
+    assert debug["solution_paths"][0]["steps"][0]["operation"] == "分成两个长方形"
+
+
+def test_debug_solution_exposes_dynamically_verified_preparation():
+    engine = TutorEngine()
+    problem = ConfirmedProblem(problem_id="dynamic-debug", confirmed_text="陌生题", match_score=0)
+    preparation = {
+        "status": "ready", "source": "generated_and_verified", "verified_answer": {"x": 6},
+        "constraints": [{"left": "2*x", "right": "12"}],
+        "candidate_solutions": [{"method": "方程法", "age_appropriate": True, "steps": [{"goal": "列方程", "operation": "2x=12", "expression": "2*x=12"}]}],
+    }
+    state = engine.create_session(problem, None, preparation=preparation)
+    debug = engine.debug_solution(state.session_id)
+    assert debug["available"] is True
+    assert debug["source"] == "generated_and_verified"
+    assert debug["answer"]["final_value"] == {"x": 6}
